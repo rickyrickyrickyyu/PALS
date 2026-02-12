@@ -1,0 +1,2847 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PALS 2025 Navigator</title>
+    <style>
+        :root {
+            /* --- CSS VARIABLES: DARK MODE (DEFAULT) --- */
+            --bg-body: #000000;
+            --bg-panel: #0a0a0a;
+            --bg-card: #141414;
+            --border-color: #333;
+
+            --text-main: #ffffff;
+            --text-sub: #cccccc;
+            --text-muted: #888888;
+
+            /* Guide Box Colors */
+            --bg-guide-def: #1c1c1e;
+            --bg-guide-cpr: #151515;
+            --bg-guide-alert: #5c000e;
+            --bg-guide-safe: #003311;
+            --bg-guide-info: #002a5c;
+
+            --text-guide-def: #ffffff;
+            --text-guide-alert: #ff6b6b;
+            --text-guide-safe: #69f0ae;
+            --text-guide-info: #64d2ff;
+
+            /* Animation Colors */
+            --text-flash-1: #ffcc00;
+            --text-flash-2: #ffffff;
+
+            /* Button Gradients */
+            --grad-red: linear-gradient(135deg, #ff3b30, #c00018);
+            --grad-yellow: linear-gradient(135deg, #ffcc00, #dcb000);
+            --grad-green: linear-gradient(135deg, #32d74b, #009922);
+            --grad-blue: linear-gradient(135deg, #0a84ff, #0050d6);
+            --grad-grey: linear-gradient(135deg, #636366, #3a3a3c);
+            --grad-dark: #1c1c1e;
+
+            /* Button Text Colors */
+            --btn-txt-std: #ffffff;
+            --btn-txt-inv: #000000;
+
+            /* Shadows */
+            --shadow-red: 0 4px 15px rgba(255, 59, 48, 0.3);
+            --shadow-yellow: 0 4px 15px rgba(255, 204, 0, 0.3);
+            --shadow-green: 0 4px 15px rgba(50, 215, 75, 0.3);
+            --shadow-blue: 0 4px 15px rgba(10, 132, 255, 0.3);
+            --shadow-cyan: 0 4px 15px rgba(100, 210, 255, 0.3);
+
+            /* Status Colors */
+            --c-red: #ff2d55;
+            --c-green: #32d74b;
+            --c-yellow: #ffcc00;
+            --c-blue: #0a84ff;
+            --c-cyan: #64d2ff;
+
+            --radius: 12px;
+        }
+
+        /* --- DAY MODE OVERRIDES --- */
+        body.day-mode {
+            --bg-body: #f2f2f7;
+            --bg-panel: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #d1d1d6;
+
+            --text-main: #000000;
+            --text-sub: #555555;
+            --text-muted: #666666;
+
+            --bg-guide-def: #ffffff;
+            --bg-guide-cpr: #ffffff;
+            --bg-guide-alert: #fff0f0;
+            --bg-guide-safe: #f0fff4;
+            --bg-guide-info: #f0f7ff;
+
+            --text-guide-def: #000000;
+            --text-guide-alert: #d70015;
+            --text-guide-safe: #006600;
+            --text-guide-info: #0040dd;
+
+            --text-flash-1: #d70015;
+            --text-flash-2: #000000;
+
+            --grad-red: linear-gradient(135deg, #ff3b30, #d70015);
+            --grad-yellow: linear-gradient(135deg, #ffcc00, #f5a623);
+            --grad-green: linear-gradient(135deg, #34c759, #248a3d);
+            --grad-blue: linear-gradient(135deg, #007aff, #0055b3);
+            --grad-grey: linear-gradient(135deg, #8e8e93, #636366);
+            --grad-dark: #e5e5ea;
+
+            --shadow-red: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --shadow-yellow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --shadow-green: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --shadow-blue: 0 2px 5px rgba(0, 0, 0, 0.2);
+            --shadow-cyan: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+            --c-red: #d70015;
+            --c-green: #008f28;
+            --c-yellow: #ac8e00;
+            --c-blue: #0040dd;
+            --c-cyan: #007aff;
+        }
+
+        /* Tweaks */
+        body.day-mode .bg-dark {
+            background: #f2f2f7;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        body.day-mode .bg-dark .btn-sub {
+            color: #666;
+        }
+
+        body.day-mode .hud-btn,
+        body.day-mode .hud-btn-back {
+            background: #f2f2f7;
+            color: #000;
+            border: 1px solid #ccc;
+        }
+
+        body.day-mode .timer-val {
+            color: var(--c-green);
+            text-shadow: none;
+        }
+
+        body.day-mode .guide {
+            border-bottom: 1px solid #ccc;
+        }
+
+        body.day-mode .t-box {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+        }
+
+        body.day-mode .t-val {
+            color: #000;
+        }
+
+        body.day-mode .ctx-bar {
+            background: #f0f0f0;
+            color: #000;
+            border-left: 5px solid var(--c-yellow);
+        }
+
+        body.day-mode .log-area {
+            background: #f9f9f9;
+            border-top: 1px solid #ccc;
+        }
+
+        body.day-mode .log-head {
+            background: #e5e5e5;
+        }
+
+        body.day-mode .log-row {
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        body.day-mode .log-t {
+            color: var(--c-blue);
+        }
+
+        body.day-mode .input-grp input {
+            background: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+        }
+
+        body.day-mode .given-state {
+            background: #e0e0e0 !important;
+            border: 2px solid #999 !important;
+            color: #666 !important;
+        }
+
+        body.day-mode .given-state .btn-sub {
+            color: #888;
+        }
+
+        body.day-mode .info-box {
+            background: #f2f7ff;
+            color: #333;
+        }
+
+        body.day-mode .info-row {
+            border-bottom: 1px solid #dceaff;
+        }
+
+        body.day-mode .info-warning {
+            background: #fff0f0;
+            color: #d70015;
+        }
+
+        body.day-mode .info-highlight {
+            background: #fffdf0;
+            border-color: var(--c-yellow);
+        }
+
+        body.day-mode .txt-yellow {
+            color: #b58500;
+        }
+
+        body.day-mode .modal {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        body.day-mode .modal div {
+            color: #000 !important;
+        }
+
+        body.day-mode #v-summary textarea {
+            background: #fff;
+            color: #000;
+            border-color: #ccc;
+        }
+
+        body.day-mode .log-ctrl-btn {
+            background: #e0e0e0;
+            color: #333;
+            border-color: #ccc;
+        }
+
+        body.day-mode .g-cpr {
+            border-bottom: 3px solid var(--c-red);
+        }
+
+        body.day-mode .suggested {
+            border-color: #333 !important;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* --- HUD --- */
+        .hud {
+            display: grid;
+            grid-template-columns: auto auto 1fr auto;
+            gap: 6px;
+            height: 60px;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            padding: 0 10px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .hud-btn,
+        .hud-btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 44px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .hud-btn {
+            font-size: 1.4rem;
+        }
+
+        .hud-btn-back {
+            font-size: 1.2rem;
+        }
+
+        .hud-btn:active,
+        .hud-btn-back:active {
+            opacity: 0.7;
+        }
+
+        .hud-btn-back.hidden-back {
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .timer-display {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .timer-val {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: monospace;
+            color: var(--c-green);
+            text-shadow: 0 0 15px rgba(50, 215, 75, 0.4);
+            line-height: 1;
+        }
+
+        .timer-lbl {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            letter-spacing: 1px;
+        }
+
+        /* Copy Feedback */
+        .copy-tag {
+            position: absolute;
+            right: 80px;
+            top: 18px;
+            background: var(--c-green);
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .show-tag {
+            opacity: 1;
+        }
+
+        /* --- GUIDE --- */
+        .guide {
+            background: var(--bg-card);
+            padding: 8px 12px;
+            min-height: 85px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 90;
+            flex-shrink: 0;
+            transition: background 0.3s ease;
+        }
+
+        .g-def {
+            background: var(--bg-guide-def);
+        }
+
+        .g-def .guide-main {
+            color: var(--text-guide-def);
+        }
+
+        .g-cpr {
+            background: var(--bg-guide-cpr);
+        }
+
+        .g-cpr .guide-main {
+            color: var(--text-guide-def);
+        }
+
+        .g-alert {
+            background: var(--bg-guide-alert);
+        }
+
+        .g-alert .guide-main {
+            color: var(--text-guide-alert);
+        }
+
+        .g-safe {
+            background: var(--bg-guide-safe);
+        }
+
+        .g-safe .guide-main {
+            color: var(--text-guide-safe);
+        }
+
+        .g-info {
+            background: var(--bg-guide-info);
+        }
+
+        .g-info .guide-main {
+            color: var(--text-guide-info);
+        }
+
+        .guide-main {
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 4px;
+            line-height: 1.1;
+        }
+
+        .guide-sub {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            text-align: center;
+            white-space: pre-wrap;
+            line-height: 1.3;
+        }
+
+        @keyframes flash-text {
+
+            0%,
+            100% {
+                opacity: 1;
+                color: var(--text-flash-1);
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            }
+
+            50% {
+                opacity: 0.6;
+                color: var(--text-flash-2);
+            }
+        }
+
+        body.day-mode @keyframes flash-text {
+
+            0%,
+            100% {
+                opacity: 1;
+                color: var(--text-flash-1);
+                text-shadow: none;
+            }
+
+            50% {
+                opacity: 0.5;
+                color: var(--text-flash-2);
+            }
+        }
+
+        .flash-cpr {
+            animation: flash-text 0.54s infinite;
+            font-weight: 900;
+        }
+
+        @keyframes pulse-border {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+                border-color: rgba(255, 255, 255, 0.8);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+                border-color: rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        body.day-mode @keyframes pulse-border {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.3);
+                border-color: rgba(0, 0, 0, 0.8);
+            }
+
+            70% {
+                box-shadow: 0 0 0 8px rgba(0, 0, 0, 0);
+                border-color: rgba(0, 0, 0, 0.2);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+                border-color: rgba(0, 0, 0, 0.8);
+            }
+        }
+
+        .suggested {
+            animation: pulse-border 1.5s infinite, flash-btn 1s infinite alternate;
+            z-index: 10;
+            border: 2px solid #fff !important;
+            font-weight: 800;
+        }
+
+        .urgent {
+            animation: urgent-flash 0.6s infinite alternate !important;
+            border-color: var(--c-red) !important;
+            box-shadow: 0 0 20px var(--c-red) !important;
+        }
+
+        @keyframes urgent-flash {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+
+            100% {
+                transform: scale(1.05);
+                filter: brightness(1.2);
+            }
+        }
+
+        @keyframes flash-btn {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+
+            100% {
+                transform: scale(1.02);
+                filter: brightness(1.1);
+            }
+        }
+
+        /* --- VIEWPORT --- */
+        .viewport {
+            flex-grow: 1;
+            padding: 12px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: var(--bg-body);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .view.active {
+            display: flex;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- BUTTONS & GRIDS --- */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .col-flex {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .section-header {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: bold;
+            margin-top: 5px;
+            margin-bottom: 2px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        button.action-btn {
+            border: none;
+            border-radius: var(--radius);
+            color: var(--btn-txt-std);
+            font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+            font-weight: 700;
+            padding: 12px 8px;
+            width: 100%;
+            min-height: 64px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        button.action-btn:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        .btn-sub {
+            font-size: 0.75rem;
+            font-weight: 400;
+            margin-top: 4px;
+            opacity: 0.9;
+            text-align: center;
+            line-height: 1.2;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Neon Gradients */
+        .bg-red {
+            background: var(--grad-red);
+            box-shadow: var(--shadow-red);
+        }
+
+        .bg-yellow {
+            background: var(--grad-yellow);
+            color: var(--btn-txt-inv) !important;
+            box-shadow: var(--shadow-yellow);
+        }
+
+        .bg-yellow .btn-sub {
+            color: #222;
+        }
+
+        .bg-green {
+            background: var(--grad-green);
+            box-shadow: var(--shadow-green);
+        }
+
+        .bg-blue {
+            background: var(--grad-blue);
+            box-shadow: var(--shadow-blue);
+        }
+
+        .bg-cyan {
+            background: var(--grad-cyan);
+            color: var(--btn-txt-inv) !important;
+        }
+
+        .bg-grey {
+            background: var(--grad-grey);
+            color: #ddd;
+        }
+
+        .bg-dark {
+            background: var(--grad-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .dimmed {
+            opacity: 0.35;
+            filter: grayscale(0.8);
+            transform: scale(0.98);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+        }
+
+        .locked {
+            opacity: 0.2;
+            pointer-events: none;
+            filter: grayscale(1);
+            border: 1px solid var(--border-color);
+        }
+
+        .given-state {
+            background: #111 !important;
+            border: 2px solid #333 !important;
+            color: #555 !important;
+            pointer-events: auto;
+            box-shadow: none;
+        }
+
+        .given-state .btn-sub {
+            color: #888;
+        }
+
+        /* Format Selection Buttons */
+        .active-fmt {
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+            filter: brightness(0.9);
+            border: 2px solid #fff !important;
+        }
+
+        body.day-mode .active-fmt {
+            border: 2px solid #000 !important;
+        }
+
+
+        /* --- DASHBOARD --- */
+        .dash {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .ctx-bar {
+            background: #000;
+            color: var(--c-yellow);
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            letter-spacing: 1px;
+            border-left: 4px solid var(--c-yellow);
+            text-transform: uppercase;
+        }
+
+        .timer-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .t-box {
+            flex: 1;
+            background: #000;
+            border-radius: 8px;
+            padding: 6px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .t-lbl {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .t-val {
+            font-size: 1.6rem;
+            font-family: monospace;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        /* Slider */
+        .slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 2px;
+        }
+
+        .slider-lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        input[type=range] {
+            flex: 1;
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        body.day-mode input[type=range] {
+            background: #ccc;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            border: 2px solid #000;
+        }
+
+        /* --- INPUTS --- */
+        .input-grp {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-grp label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .input-grp input {
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            width: 100%;
+            font-family: monospace;
+            text-align: center;
+        }
+
+        .input-grp input:focus {
+            border-color: var(--c-blue);
+            outline: none;
+            background: #333;
+        }
+
+        /* --- LOGS --- */
+        .log-area {
+            height: 130px;
+            background: #000;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: height 0.3s;
+            position: relative;
+            z-index: 150;
+        }
+
+        .log-area.expanded {
+            height: 80vh;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            border-top: 2px solid var(--c-yellow);
+        }
+
+        .log-head {
+            padding: 6px 12px;
+            background: var(--bg-panel);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-ctrl-grp {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .log-ctrl-btn {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            background: #222;
+            color: #ccc;
+            border: 1px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        body.day-mode .log-ctrl-btn {
+            background: #e0e0e0;
+            color: #333;
+            border-color: #ccc;
+        }
+
+        .log-ctrl-btn:active {
+            background: #444;
+        }
+
+        .log-list {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .log-row {
+            padding: 6px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            display: flex;
+            align-items: flex-start;
+            /* Top align for wrapping */
+            gap: 10px;
+        }
+
+        .log-t {
+            color: var(--c-cyan);
+            min-width: 55px;
+            /* Fixed width */
+            flex-shrink: 0;
+            /* Prevent shrinking */
+            font-weight: bold;
+            margin-top: 1px;
+            /* Align with text */
+        }
+
+        .log-txt {
+            flex-grow: 1;
+            min-width: 0;
+            /* Flexbox wrap fix */
+            word-break: break-word;
+            /* Ensure wrapping */
+            overflow-wrap: break-word;
+        }
+
+        .log-del {
+            color: #555;
+            cursor: pointer;
+            padding: 0 5px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .log-del:hover {
+            color: var(--c-red);
+        }
+
+        /* --- MODALS --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 200;
+            /* Standard modal level */
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Fix for Issue 1: Confirmation Modal needs higher Z-Index */
+        #modal-confirm {
+            z-index: 300;
+        }
+
+        body.day-mode .modal {
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        body.day-mode .modal div {
+            color: #000 !important;
+        }
+
+        textarea.hidden-copy {
+            position: fixed;
+            top: -9999px;
+        }
+
+        #v-summary textarea {
+            width: 100%;
+            height: 200px;
+            background: #111;
+            color: #0f0;
+            border: 1px solid #333;
+            padding: 12px;
+            font-family: monospace;
+            border-radius: 12px;
+            resize: none;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        body.day-mode #v-summary textarea {
+            background: #fff;
+            color: #000;
+            border-color: #ccc;
+        }
+
+        /* --- INFO BOX --- */
+        .info-box {
+            background: #1a1a1a;
+            border-left: 4px solid var(--c-blue);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #eee;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2px;
+        }
+
+        .info-warning {
+            background: rgba(255, 59, 48, 0.1);
+            border-left: 4px solid var(--c-red);
+            color: #ff8a80;
+            padding: 4px;
+            margin-bottom: 5px;
+        }
+
+        .info-highlight {
+            border: 1px solid var(--c-yellow);
+            background: rgba(255, 204, 0, 0.05);
+            border-left: 4px solid var(--c-yellow);
+        }
+
+        .info-highlight .info-row {
+            border-color: rgba(255, 204, 0, 0.2);
+        }
+
+        .txt-yellow {
+            color: var(--c-yellow);
+            font-weight: bold;
+        }
+
+
+        /* --- RESPONSIVE --- */
+
+        /* === ULTRA-SMALL PHONES (≤360px, e.g. iPhone SE, Galaxy S small) === */
+        @media (max-width: 360px) {
+            .hud {
+                height: 50px;
+                padding: 0 6px;
+                gap: 4px;
+            }
+
+            .hud-btn,
+            .hud-btn-back {
+                width: 36px;
+                height: 34px;
+                border-radius: 8px;
+            }
+
+            .hud-btn {
+                font-size: 1.1rem;
+            }
+
+            .timer-val {
+                font-size: 1.4rem;
+            }
+
+            .timer-lbl {
+                font-size: 0.55rem;
+            }
+
+            .guide {
+                min-height: 65px;
+                padding: 6px 8px;
+            }
+
+            .guide-main {
+                font-size: 1rem;
+            }
+
+            .guide-sub {
+                font-size: 0.72rem;
+            }
+
+            .viewport {
+                padding: 6px;
+            }
+
+            button.action-btn {
+                font-size: 0.82rem;
+                padding: 6px 4px;
+                min-height: 52px;
+                border-radius: 10px;
+            }
+
+            .btn-sub {
+                font-size: 0.6rem;
+            }
+
+            .grid-2,
+            .grid-4 {
+                gap: 6px;
+            }
+
+            .t-val {
+                font-size: 1.2rem;
+            }
+
+            .t-lbl {
+                font-size: 0.55rem;
+            }
+
+            .dash {
+                padding: 8px;
+                border-radius: 12px;
+            }
+
+            .ctx-bar {
+                font-size: 0.75rem;
+                padding: 6px;
+            }
+
+            .log-area {
+                height: 100px;
+            }
+
+            .log-row {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+
+            .section-header {
+                font-size: 0.75rem;
+            }
+
+            .info-box {
+                font-size: 0.78rem;
+                padding: 8px;
+            }
+
+            #v-summary textarea {
+                height: 150px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* === STANDARD PHONES (361px–480px) === */
+        @media (min-width: 361px) and (max-width: 480px) {
+            .hud {
+                height: 54px;
+                padding: 0 8px;
+            }
+
+            .hud-btn,
+            .hud-btn-back {
+                width: 40px;
+                height: 36px;
+            }
+
+            .timer-val {
+                font-size: 1.5rem;
+            }
+
+            .guide {
+                min-height: 72px;
+                padding: 6px 10px;
+            }
+
+            .guide-main {
+                font-size: 1.15rem;
+            }
+
+            .guide-sub {
+                font-size: 0.8rem;
+            }
+
+            .viewport {
+                padding: 8px;
+            }
+
+            button.action-btn {
+                font-size: 0.88rem;
+                padding: 8px 4px;
+                min-height: 56px;
+            }
+
+            .btn-sub {
+                font-size: 0.65rem;
+            }
+
+            .grid-2,
+            .grid-4 {
+                gap: 8px;
+            }
+
+            .t-val {
+                font-size: 1.3rem;
+            }
+
+            .log-area {
+                height: 110px;
+            }
+
+            .log-row {
+                font-size: 0.8rem;
+            }
+
+            #v-summary textarea {
+                height: 160px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* === TABLETS (481px–768px) === */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .hud {
+                height: 58px;
+                padding: 0 12px;
+            }
+
+            .guide {
+                min-height: 80px;
+                padding: 8px 16px;
+            }
+
+            .guide-main {
+                font-size: 1.35rem;
+            }
+
+            .guide-sub {
+                font-size: 0.92rem;
+            }
+
+            .viewport {
+                padding: 12px;
+            }
+
+            button.action-btn {
+                font-size: 1rem;
+                min-height: 64px;
+                border-radius: 12px;
+            }
+
+            .grid-2,
+            .grid-4 {
+                gap: 10px;
+            }
+
+            .t-val {
+                font-size: 1.5rem;
+            }
+
+            .log-area {
+                height: 130px;
+            }
+
+            #v-summary textarea {
+                height: 200px;
+            }
+        }
+
+        /* === DESKTOP (≥769px) === */
+        @media (min-width: 769px) {
+            body {
+                max-width: 900px;
+                margin: 0 auto;
+                position: fixed;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .hud {
+                height: 64px;
+                padding: 0 16px;
+                gap: 8px;
+                border-radius: 0 0 12px 12px;
+            }
+
+            .hud-btn,
+            .hud-btn-back {
+                width: 48px;
+                height: 44px;
+                border-radius: 10px;
+            }
+
+            .timer-val {
+                font-size: 2rem;
+            }
+
+            .guide {
+                min-height: 90px;
+                padding: 10px 20px;
+            }
+
+            .guide-main {
+                font-size: 1.6rem;
+            }
+
+            .guide-sub {
+                font-size: 1.05rem;
+            }
+
+            .viewport {
+                padding: 16px 20px;
+            }
+
+            button.action-btn {
+                font-size: 1.15rem;
+                min-height: 72px;
+                border-radius: 14px;
+                transition: all 0.15s ease;
+            }
+
+            button.action-btn:hover {
+                filter: brightness(1.1);
+                transform: scale(1.01);
+            }
+
+            .btn-sub {
+                font-size: 0.8rem;
+            }
+
+            .grid-2,
+            .grid-4 {
+                gap: 12px;
+            }
+
+            .t-val {
+                font-size: 1.8rem;
+            }
+
+            .t-box {
+                padding: 8px;
+            }
+
+            .dash {
+                padding: 14px;
+                border-radius: 18px;
+            }
+
+            .ctx-bar {
+                font-size: 1rem;
+                padding: 10px;
+                border-radius: 10px;
+            }
+
+            .log-area {
+                height: 150px;
+                border-radius: 0;
+            }
+
+            .log-row {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+
+            .section-header {
+                font-size: 0.95rem;
+                margin-top: 8px;
+            }
+
+            .info-box {
+                font-size: 0.92rem;
+                padding: 14px;
+            }
+
+            #v-summary textarea {
+                height: 250px;
+                font-size: 0.95rem;
+            }
+
+            .input-grp input {
+                font-size: 1.15rem;
+                padding: 10px;
+            }
+        }
+
+        /* === LARGE DESKTOP (≥1200px) === */
+        @media (min-width: 1200px) {
+            .guide-main {
+                font-size: 1.8rem;
+            }
+
+            button.action-btn {
+                min-height: 80px;
+                font-size: 1.2rem;
+            }
+
+            .t-val {
+                font-size: 2rem;
+            }
+        }
+
+        /* === MODAL RESPONSIVE === */
+        @media (max-width: 480px) {
+
+            .modal>div,
+            .modal>button {
+                width: 92% !important;
+            }
+
+            #modal-change>div:last-child {
+                width: 95% !important;
+            }
+
+            #modal-alert>div:first-child {
+                font-size: 2rem !important;
+            }
+
+            #modal-alert>button {
+                width: 90% !important;
+                height: 70px !important;
+                font-size: 1.2rem !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+
+            .modal>div,
+            .modal>button {
+                max-width: 600px;
+            }
+
+            #modal-change>div:last-child {
+                max-width: 600px;
+            }
+        }
+
+        /* === LANDSCAPE PHONE FIX === */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .guide {
+                min-height: 50px;
+                padding: 4px 10px;
+            }
+
+            .guide-main {
+                font-size: 1rem;
+            }
+
+            .guide-sub {
+                font-size: 0.7rem;
+            }
+
+            .hud {
+                height: 44px;
+            }
+
+            button.action-btn {
+                min-height: 44px;
+                padding: 4px;
+            }
+
+            .log-area {
+                height: 80px;
+            }
+
+            .dash {
+                padding: 6px;
+                gap: 4px;
+            }
+
+            .t-val {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HUD -->
+    <div class="hud">
+        <!-- Safety Check for HOME Button -->
+        <button class="hud-btn" onclick="app.showEndModal()">🏠</button>
+        <button id="btn-back" class="hud-btn-back hidden-back" onclick="app.goBack()">⬅</button>
+        <div class="timer-display">
+            <span class="timer-val" id="total-time">00:00</span>
+            <span class="timer-lbl">ELAPSED</span>
+        </div>
+        <div style="position:relative; display:flex; gap:5px;">
+            <div id="copy-tag" class="copy-tag">COPIED!</div>
+            <button class="hud-btn" style="font-size:1.2rem;" onclick="app.toggleTheme()">☀</button>
+            <button class="hud-btn" style="color:var(--c-green); border-color:var(--c-green);"
+                onclick="app.quickCopy()">LOG</button>
+        </div>
+    </div>
+
+    <!-- GUIDE -->
+    <div id="guide-box" class="guide g-def">
+        <span id="g-main" class="guide-main">PALS 2025</span>
+        <span id="g-sub" class="guide-sub">請先輸入體重 (kg)</span>
+    </div>
+
+    <!-- VIEWPORT -->
+    <div class="viewport">
+
+        <!-- 1. HOME: WEIGHT ENTRY -->
+        <div id="v-home" class="view active">
+            <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px;">
+                <div class="input-grp">
+                    <label>PATIENT WEIGHT (kg) 病患體重</label>
+                    <input type="number" id="pt-weight" placeholder="Enter kg"
+                        style="font-size:2rem; font-weight:bold; text-align:center;">
+                </div>
+                <button class="action-btn bg-green suggested" style="font-size:1.3rem; padding:18px;"
+                    onclick="app.confirmWeight()">
+                    ▶ START
+                    <span class="btn-sub">確認體重，開始記錄</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 1.5 SELECT: HR + MODULE -->
+        <div id="v-select" class="view">
+            <div class="input-grp" style="margin-bottom:8px;">
+                <label>HEART RATE (bpm) 心率</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="number" id="pt-hr" placeholder="Enter bpm"
+                        style="font-size:1.5rem; font-weight:bold; flex:1;">
+                    <button class="action-btn bg-dark" style="width:80px; min-height:0; padding:8px;"
+                        onclick="app.logHR()">記錄</button>
+                </div>
+            </div>
+            <div class="section-header">CARDIAC ARREST (PULSELESS)</div>
+            <div class="grid-4">
+                <button class="action-btn bg-red" onclick="app.startModule('VF')">VF</button>
+                <button class="action-btn bg-red" onclick="app.startModule('pVT')">pVT</button>
+                <button class="action-btn bg-grey" onclick="app.startModule('PEA')">PEA</button>
+                <button class="action-btn bg-grey" onclick="app.startModule('Asystole')">Asystole</button>
+            </div>
+            <div class="section-header">PULSE PRESENT</div>
+            <div class="grid-2">
+                <button class="action-btn bg-blue" onclick="app.startModule('BRADY')">
+                    BRADYCARDIA
+                    <span class="btn-sub">HR &lt; 60 + Poor Perfusion</span>
+                </button>
+                <button class="action-btn bg-yellow" onclick="app.startModule('TACHY')">
+                    TACHYCARDIA
+                    <span class="btn-sub">Infant ≥220 / Child ≥180</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. ARREST: CHARGING -->
+        <div id="v-arrest-charge" class="view">
+            <div class="dash">
+                <div class="ctx-bar" id="charge-ctx">VF/pVT - SHOCK ADVISED</div>
+            </div>
+            <div class="grid-2" style="flex-grow: 1;">
+                <button id="btn-cpr-charge" class="action-btn bg-dark suggested" onclick="arrest.logCPRCharging()">
+                    CPR (Charging)
+                    <span class="btn-sub">Keep Compressing</span>
+                </button>
+                <button class="action-btn bg-yellow suggested" onclick="arrest.deliverShock()">
+                    ⚡ SHOCK DELIVERED ⚡
+                    <span id="sub-shock" class="btn-sub" style="color:#000">Clear & Shock</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. ARREST: LOOP -->
+        <div id="v-arrest-loop" class="view">
+            <div class="dash">
+                <div class="ctx-bar" id="loop-status">CPR CYCLE</div>
+                <div class="timer-row">
+                    <div class="t-box">
+                        <span class="t-lbl">CPR</span>
+                        <span id="t-cpr" class="t-val">02:00</span>
+                    </div>
+                    <div class="t-box">
+                        <span class="t-lbl">EPI (3m)</span>
+                        <span id="t-epi" class="t-val" style="color:var(--c-blue)">00:00</span>
+                    </div>
+                    <div class="t-box">
+                        <span class="t-lbl">SHOCKS</span>
+                        <span id="val-shocks" class="t-val" style="color:var(--c-yellow)">0</span>
+                    </div>
+                </div>
+                <div class="slider-wrap">
+                    <span class="slider-lbl">TEST SKIP</span>
+                    <input type="range" id="cpr-slider" min="0" max="120" value="120"
+                        oninput="arrest.sliderInput(this.value)" onchange="arrest.sliderChange(this.value)">
+                </div>
+            </div>
+
+            <div id="slot-action" style="min-height: 20px;"></div>
+
+            <div class="grid-2" style="flex-grow: 1;">
+                <button id="btn-epi" class="action-btn bg-blue" onclick="arrest.giveEpi()">
+                    Epinephrine
+                    <span id="sub-epi" class="btn-sub">0.01 mg/kg IV/IO #0</span>
+                </button>
+
+                <button id="btn-anti" class="action-btn bg-blue locked" onclick="arrest.giveAnti()">
+                    Amiodarone
+                    <span id="sub-anti" class="btn-sub">Wait...</span>
+                </button>
+
+                <button id="btn-toggle" class="action-btn bg-dark"
+                    style="grid-column: span 2; height: 40px; min-height: 40px;" onclick="arrest.toggleDrug()">
+                    Switch to <span id="lbl-drug" style="margin-left: 5px; color: inherit;">Lidocaine</span>
+                </button>
+
+                <button class="action-btn bg-green" style="background: #00695c;"
+                    onclick="app.log('Advanced Airway / Capnography Secured', 'Generic')">Airway</button>
+                <button class="action-btn bg-grey"
+                    onclick="app.log('Intravenous / Intraosseous Access Secured', 'Generic')">IV/IO</button>
+            </div>
+
+            <div class="grid-2" style="margin-top:10px;">
+                <button class="action-btn bg-green" style="height: 60px;"
+                    onclick="app.confirmAction('Confirm ROSC Achieved?', () => app.rosc())">ROSC ACHIEVED</button>
+                <button class="action-btn bg-red" style="height: 60px;"
+                    onclick="app.confirmAction('Terminate CPR?', () => app.endCode('Ended: Terminate CPR'))">⚫
+                    TERMINATE</button>
+            </div>
+        </div>
+
+        <!-- 4. CHECK RHYTHM -->
+        <div id="v-arrest-check" class="view">
+            <div style="text-align: center; color: var(--text-muted); font-weight:bold;">CPR COMPLETED. ANALYZE RHYTHM.
+            </div>
+            <div class="grid-4">
+                <button class="action-btn bg-yellow suggested" onclick="arrest.setRhythm('VF')">VF</button>
+                <button class="action-btn bg-yellow suggested" onclick="arrest.setRhythm('pVT')">pVT</button>
+                <button class="action-btn bg-grey suggested" onclick="arrest.setRhythm('PEA')">PEA</button>
+                <button class="action-btn bg-grey suggested" onclick="arrest.setRhythm('Asystole')">Asystole</button>
+            </div>
+
+            <div class="grid-2" style="margin-top:auto">
+                <button class="action-btn bg-green" style="height: 60px;"
+                    onclick="app.confirmAction('Confirm ROSC Achieved?', () => app.rosc())">ROSC (Pulse
+                    Present)</button>
+                <button class="action-btn bg-red" style="height: 60px;"
+                    onclick="app.confirmAction('Confirm Terminate Resuscitation?', () => app.endCode('Ended: Resuscitation Terminated'))">⚫
+                    TERMINATE / END</button>
+            </div>
+        </div>
+
+        <!-- 5. STABILITY CHECK -->
+        <div id="v-stability" class="view">
+            <div class="dash" style="border-color: var(--c-red);">
+                <div class="ctx-bar" style="border-color: var(--c-red); color: var(--c-red);">ASSESS STABILITY
+                    (有無昏痛喘休克血壓低)</div>
+                <div style="font-size:1.1rem; font-weight:bold; color:var(--c-red); line-height:1.6; padding:10px;">
+                    🔴 昏 (Altered Mental Status / AMS)<br>🔴 痛 (Chest Pain / Discomfort)<br>🔴 喘 (Respiratory Distress /
+                    Failure)<br>🔴 休克 (Shock: Cool skin, weak pulse, CRT &gt; 2s)<br>🔴 血壓低 (SBP &lt; 70 + 2×age)
+                </div>
+            </div>
+            <div id="symptom-selector" style="display:none; grid-template-columns: 1fr 1fr; gap:8px;">
+                <button class="action-btn bg-dark" onclick="app.logSymptom('Altered Mental Status (昏)')">昏</button>
+                <button class="action-btn bg-dark" onclick="app.logSymptom('Chest Pain / Discomfort (痛)')">痛</button>
+                <button class="action-btn bg-dark"
+                    onclick="app.logSymptom('Respiratory Distress / Failure (喘)')">喘</button>
+                <button class="action-btn bg-dark" onclick="app.logSymptom('Shock: Cool skin, CRT>2s (休克)')">休克</button>
+                <button class="action-btn bg-dark" style="grid-column:span 2"
+                    onclick="app.logSymptom('Hypotension: SBP < 70+2×age (血壓低)')">血壓低</button>
+                <button class="action-btn bg-green" style="grid-column:span 2; margin-top:10px;"
+                    onclick="app.handleStability(true)">STABLE</button>
+            </div>
+        </div>
+
+        <!-- BRADY VIEW -->
+        <div id="v-brady-action" class="view">
+            <div id="brady-content" class="col-flex"></div>
+            <div class="grid-2" style="margin-top:auto">
+                <button class="action-btn bg-grey" onclick="app.showRhythmChange()">Rhythm Change</button>
+                <button class="action-btn bg-green"
+                    onclick="app.confirmAction('End Exam?', () => app.endCode('Ended: Patient Stabilized'))">🏁
+                    END</button>
+            </div>
+        </div>
+
+        <!-- TACHY UNSTABLE SELECT (PALS) -->
+        <div id="v-tachy-unstable-select" class="view">
+            <div style="text-align:center; color:var(--text-muted);">Unstable Tachycardia — Synchronized Cardioversion
+            </div>
+
+            <div class="info-box info-highlight">
+                <div class="info-row"><span class="txt-yellow">Sedation</span> <span id="sedation-info">Dormicum 0.1
+                        mg/kg IV</span></div>
+                <div class="info-row"><span class="txt-yellow">Max</span> <span>5 mg single dose</span></div>
+            </div>
+
+            <button id="btn-sedation" class="action-btn bg-blue suggested" onclick="tachy.giveSedation()">
+                💉 Sedation (Dormicum)
+                <span id="sub-sedation" class="btn-sub">0.1 mg/kg IV</span>
+            </button>
+
+            <div class="section-header">SYNCHRONIZED CARDIOVERSION</div>
+            <div class="grid-2">
+                <button id="btn-cardio1" class="action-btn bg-yellow suggested" onclick="tachy.cardiovert(1)">
+                    1st Cardioversion
+                    <span id="sub-cardio1" class="btn-sub">0.5-1 J/kg</span>
+                </button>
+                <button id="btn-cardio2" class="action-btn bg-yellow dimmed" onclick="tachy.cardiovert(2)">
+                    2nd Cardioversion
+                    <span id="sub-cardio2" class="btn-sub">2 J/kg</span>
+                </button>
+            </div>
+
+            <button class="action-btn bg-dark" style="margin-top:10px;"
+                onclick="app.log('Consider Antiarrhythmic / Expert Consultation', 'Generic', this)">
+                Consult / Anti-arrhythmic
+                <span class="btn-sub">If Refractory</span>
+            </button>
+
+            <!-- FOOTER -->
+            <div class="grid-2" style="margin-top:auto;">
+                <button class="action-btn bg-grey" onclick="app.showRhythmChange()">Rhythm Change</button>
+                <button class="action-btn bg-green"
+                    onclick="app.confirmAction('End Exam?', () => app.endCode('Ended: Patient Stabilized'))">🏁
+                    END</button>
+            </div>
+        </div>
+
+        <!-- TACHY ACTION -->
+        <div id="v-tachy-action" class="view">
+            <div id="tachy-content" class="col-flex"></div>
+            <div class="grid-2" style="margin-top:auto;">
+                <button class="action-btn bg-grey" onclick="app.showRhythmChange()">Rhythm Change</button>
+                <button class="action-btn bg-green"
+                    onclick="app.confirmAction('End Exam?', () => app.endCode('Ended: Patient Stabilized'))">🏁
+                    END</button>
+            </div>
+        </div>
+
+        <!-- ROSC CARE VIEW (FEATURE C) -->
+        <div id="v-rosc-care" class="view">
+            <div class="dash" style="border-color: var(--c-green);">
+                <div class="ctx-bar" style="border-color: var(--c-green); color: var(--c-green);">POST-CARDIAC ARREST
+                    CARE</div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+                    <div class="input-grp">
+                        <label>HR</label>
+                        <input type="number" id="rosc-hr" placeholder="bpm">
+                    </div>
+                    <div class="input-grp">
+                        <label>SBP</label>
+                        <input type="number" id="rosc-sbp" placeholder="mmHg">
+                    </div>
+                    <div class="input-grp">
+                        <label>DBP</label>
+                        <input type="number" id="rosc-dbp" placeholder="mmHg">
+                    </div>
+                    <div class="input-grp" style="grid-column: span 3;">
+                        <label>SpO2 (%)</label>
+                        <input type="number" id="rosc-spo2" placeholder="%">
+                    </div>
+                </div>
+                <button class="action-btn bg-blue" style="min-height: 50px; font-size:1rem; margin-top:8px;"
+                    onclick="app.logVitals()">
+                    📥 LOG VITALS
+                </button>
+            </div>
+
+            <div class="section-header">IMMEDIATE ACTIONS</div>
+            <div class="grid-2">
+                <button class="action-btn bg-dark" onclick="app.log('12-Lead EKG Performed', 'Generic')">12-Lead
+                    EKG</button>
+                <button class="action-btn bg-dark"
+                    onclick="app.log('Target Temperature Management Started', 'Generic')">TTM Started</button>
+                <button class="action-btn bg-dark" onclick="app.logWeightAction('IV Fluid Bolus', 20, 'ml/kg NS')">Fluid
+                    Bolus<span class="btn-sub">20 ml/kg NS</span></button>
+                <button class="action-btn bg-dark"
+                    onclick="app.log('Vasopressor Infusion Started (Epi/Norepi)', 'Generic')">Vasopressor</button>
+            </div>
+
+            <div class="grid-2" style="margin-top:auto;">
+                <button class="action-btn bg-grey" onclick="app.showRhythmChange()">Rhythm Change / Re-arrest</button>
+                <button class="action-btn bg-green"
+                    onclick="app.confirmAction('Finalize and End Log?', () => app.endCode('Ended: ROSC & Stabilized'))">🏁
+                    FINALIZE</button>
+            </div>
+        </div>
+
+        <!-- 7. SUMMARY -->
+        <div id="v-summary" class="view">
+            <div style="text-align: center; font-size: 1.5rem; color: var(--c-red); font-weight: bold; margin-bottom: 10px;"
+                id="end-title">RESUSCITATION ENDED</div>
+            <div style="text-align: center; color: var(--text-sub); margin-bottom: 10px;">Total Time: <span
+                    id="end-time">00:00</span></div>
+
+            <div class="grid-2" style="margin-bottom: 10px; height: 40px; min-height: 0;">
+                <button id="btn-fmt-chrono" class="action-btn bg-blue" style="min-height: 40px; font-size: 0.9rem;"
+                    onclick="app.setLogFormat('chrono')">Chronological</button>
+                <button id="btn-fmt-soap" class="action-btn bg-dark" style="min-height: 40px; font-size: 0.9rem;"
+                    onclick="app.setLogFormat('soap')">Summary (SOAP)</button>
+            </div>
+
+            <textarea id="final-log" readonly></textarea>
+            <button class="action-btn bg-yellow" onclick="app.copyFinalLog()">COPY TO CLIPBOARD</button>
+            <button class="action-btn bg-grey" onclick="app.hardReset()">START NEW PATIENT</button>
+        </div>
+
+    </div>
+
+    <!-- LOG DRAWER -->
+    <div id="log-area" class="log-area">
+        <div class="log-head">
+            <div class="log-ctrl-grp">
+                <button onclick="app.undoLast()" class="log-ctrl-btn">⎌ Undo</button>
+                <span style="font-size:0.7rem; color:var(--text-muted); font-weight:bold;">LOG</span>
+            </div>
+            <div class="log-ctrl-grp">
+                <button onclick="app.toggleLogExpand()" class="log-ctrl-btn">⤢ EXPAND</button>
+            </div>
+        </div>
+        <ul id="log-list" class="log-list"></ul>
+    </div>
+
+    <!-- MODAL ALERTS -->
+    <div id="modal-alert" class="modal">
+        <div
+            style="font-size: 2.5rem; color: var(--c-red); font-weight: 900; text-align: center; margin-bottom: 30px; text-shadow: 0 0 20px #000;">
+            STOP CPR!<br>CHECK RHYTHM</div>
+        <button class="action-btn bg-yellow suggested" style="width: 80%; height: 90px; font-size:1.5rem; color:black;"
+            onclick="arrest.confirmCheck()">OK, CHECKING</button>
+    </div>
+
+    <!-- UNIFIED CONFIRM MODAL (Safety Check - Highest Z-Index) -->
+    <div id="modal-confirm" class="modal" style="z-index: 300;">
+        <div id="confirm-title"
+            style="font-size: 1.5rem; color: var(--text-main); font-weight: bold; margin-bottom: 20px; text-align:center;">
+            Are you sure?</div>
+        <div class="grid-2" style="width: 80%;">
+            <button class="action-btn bg-grey" onclick="app.closeModals()">CANCEL</button>
+            <button class="action-btn bg-red" onclick="app.executeAction()">CONFIRM</button>
+        </div>
+    </div>
+
+    <!-- RHYTHM CHANGE MODAL (Lower Z-Index) -->
+    <div id="modal-change" class="modal" style="z-index: 200;">
+        <div style="font-size: 1.2rem; color: var(--text-main); font-weight: bold; margin-bottom: 10px;">Rhythm Changed
+            To:</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; width:90%;">
+            <button class="action-btn bg-green"
+                onclick="app.confirmAction('Return to Normal Sinus?', () => app.changeToNormal())">Normal Sinus</button>
+            <button class="action-btn bg-blue" onclick="app.changeToBrady()">Bradycardia</button>
+            <button class="action-btn bg-yellow" onclick="app.changeToTachy()">Tachycardia</button>
+            <button class="action-btn bg-red" onclick="app.changeToArrestType('VF')">VF</button>
+            <button class="action-btn bg-red" onclick="app.changeToArrestType('pVT')">pVT</button>
+            <button class="action-btn bg-grey" onclick="app.changeToArrestType('PEA')">PEA</button>
+            <button class="action-btn bg-grey" onclick="app.changeToArrestType('Asystole')">Asystole</button>
+            <button class="action-btn bg-dark" onclick="app.closeModals()" style="grid-column: span 2;">Cancel</button>
+        </div>
+    </div>
+
+    <textarea id="temp-copy" class="hidden-copy"></textarea>
+
+    <script>
+        // --- CORE APP ---
+        const app = {
+            startTime: null,
+            timer: null,
+            mode: null,
+            logData: [],
+            logFormat: 'chrono',
+            timeouts: [],
+            viewHistory: [],
+            currentView: 'v-home',
+            pendingAction: null,
+            endReason: '',
+
+            getWeight: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value);
+                if (!w || w <= 0) { alert('請先輸入病患體重 (kg)'); return null; }
+                return w;
+            },
+
+            confirmWeight: () => {
+                const w = app.getWeight();
+                if (w === null) return;
+                if (!app.startTime) app.initTimer();
+                app.log(`Patient Weight: ${w} kg`, 'System');
+                app.guide("PALS 2025", `Weight: ${w}kg — 輸入心率`, "g-info");
+                app.setView('v-select');
+            },
+
+            logHR: () => {
+                const hr = parseInt(document.getElementById('pt-hr').value);
+                if (!hr || hr <= 0) { alert('請輸入心率 (bpm)'); return; }
+                app.log(`Heart Rate: ${hr} bpm`, 'Vitals');
+                // Visual feedback
+                const btn = event.target.closest('button');
+                if (btn) app.markGiven(btn, '記錄');
+            },
+
+            logWeightAction: (label, perKg, unit) => {
+                const w = app.getWeight();
+                if (w === null) return;
+                const dose = Math.round(w * perKg);
+                app.log(`${label} ${dose}${unit} (${perKg}${unit} × ${w}kg)`, 'Generic');
+            },
+
+            startModule: (mod) => {
+                const w = app.getWeight();
+                if (w === null) return;
+                if (!app.startTime) app.initTimer();
+
+                if (['VF', 'pVT', 'PEA', 'Asystole'].includes(mod)) {
+                    app.mode = 'arrest';
+                    app.log(`Code Blue Started: ${mod} (Weight: ${w}kg)`, 'System');
+                    arrest.init(mod);
+                } else if (mod === 'BRADY') {
+                    app.mode = 'brady';
+                    app.guide("Assess Stability", "HR < 60 + Poor Perfusion?", "g-info");
+                    app.setView('v-stability');
+                    document.getElementById('symptom-selector').style.display = 'grid';
+                } else if (mod === 'TACHY') {
+                    app.mode = 'tachy';
+                    app.guide("Assess Stability", "有無昏痛喘休克血壓低", "g-info");
+                    app.setView('v-stability');
+                    document.getElementById('symptom-selector').style.display = 'grid';
+                }
+            },
+
+            toggleTheme: () => {
+                document.body.classList.toggle('day-mode');
+            },
+
+            handleStability: (isStable) => {
+                if (app.mode === 'brady') brady.init(isStable);
+                if (app.mode === 'tachy') tachy.init(isStable);
+            },
+
+            logSymptom: (sym) => {
+                // Combined Log Logic
+                let diagnosis = "";
+                if (app.mode === 'brady') diagnosis = "Unstable Bradycardia";
+                else if (app.mode === 'tachy') diagnosis = "Unstable Tachycardia";
+
+                app.log(`Patient complains: ${sym}, 處置 ${diagnosis}`, 'Symptom');
+                app.handleStability(false);
+            },
+
+            initTimer: () => {
+                // Fix for timer glitch: clear existing before creating new
+                if (app.timer) clearInterval(app.timer);
+
+                app.startTime = Date.now();
+                app.timer = setInterval(() => {
+                    const s = Math.floor((Date.now() - app.startTime) / 1000);
+                    const m = Math.floor(s / 60).toString().padStart(2, '0');
+                    const sec = (s % 60).toString().padStart(2, '0');
+                    document.getElementById('total-time').innerText = `${m}:${sec}`;
+                }, 1000);
+
+                window.addEventListener('beforeunload', (e) => { e.preventDefault(); e.returnValue = ''; });
+            },
+
+            log: (msg, type = 'Generic', btn = null) => {
+                const ts = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+                const el = document.getElementById('total-time').innerText;
+                const logId = Date.now() + Math.random().toString(16).slice(2);
+
+                app.logData.push({ id: logId, msg: msg, type: type, timestamp: ts, elapsed: el, viewId: app.currentView });
+
+                const li = document.createElement('li');
+                li.id = logId;
+                li.className = 'log-row';
+                li.innerHTML = `
+                    <span class="log-t">${ts}</span>
+                    <span class="log-txt">${msg}</span>
+                    <span class="log-del" onclick="app.deleteLog('${logId}')">[x]</span>
+                `;
+                document.getElementById('log-list').prepend(li);
+
+                if (btn) {
+                    let label = btn.innerText.split('\n')[0];
+                    app.markGiven(btn, label);
+                }
+            },
+
+            markGiven: (btn, label) => {
+                if (!btn) return;
+                const ts = new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                btn.classList.add('given-state');
+                btn.classList.remove('suggested', 'urgent', 'flash-cpr', 'bg-blue', 'bg-red', 'bg-yellow');
+                btn.style.animation = 'none';
+                btn.innerHTML = `✔ ${label}<br><span class="btn-sub" style="color:var(--text-muted);">@ ${ts}</span>`;
+            },
+
+            resetButtonState: (btnId, title, subId, subText) => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.className = 'action-btn'; // Reset classes
+                    btn.style.animation = '';
+                    btn.innerHTML = `${title}<span id="${subId}" class="btn-sub">${subText}</span>`;
+                }
+            },
+
+            deleteLog: (id) => {
+                const el = document.getElementById(id);
+                if (el) el.remove();
+                app.logData = app.logData.filter(log => log.id !== id);
+            },
+
+            undoLast: () => {
+                if (app.logData.length === 0) return;
+                const lastLog = app.logData.pop();
+                const el = document.getElementById(lastLog.id);
+                if (el) el.remove();
+
+                if (lastLog.type === 'Epi') {
+                    if (arrest.epiCount > 0) arrest.epiCount--;
+                }
+                else if (lastLog.type === 'Shock') {
+                    if (arrest.shockCount > 0) arrest.shockCount--;
+                    document.getElementById('val-shocks').innerText = arrest.shockCount;
+                }
+                else if (lastLog.type === 'Atropine') {
+                    if (brady.atropineCount > 0) brady.atropineCount--;
+                }
+            },
+
+            toggleLogExpand: () => { document.getElementById('log-area').classList.toggle('expanded'); },
+            clearTimeouts: () => { app.timeouts.forEach(id => clearTimeout(id)); app.timeouts = []; },
+
+            // --- SAFETY CONFIRMATION SYSTEM ---
+            confirmAction: (title, callback) => {
+                app.pendingAction = callback;
+                document.getElementById('confirm-title').innerText = title;
+                // Force close other modals to prevent stacking issues, or ensure z-index is handled
+                // We rely on CSS z-index 300 for modal-confirm
+                document.getElementById('modal-confirm').style.display = 'flex';
+            },
+
+            executeAction: () => {
+                if (app.pendingAction) {
+                    app.pendingAction();
+                    app.pendingAction = null;
+                }
+                app.closeModals();
+            },
+
+            closeModals: () => {
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+                app.pendingAction = null;
+            },
+
+            showEndModal: () => {
+                app.confirmAction("Return Home? Data will be lost.", () => app.hardReset());
+            },
+
+            hideEndModal: () => { app.closeModals(); },
+
+            endCode: (reason) => {
+                app.endReason = reason;
+                app.clearTimeouts();
+                app.hideEndModal();
+                app.closeModals();
+
+                clearInterval(app.timer);
+                if (arrest.cprTimer) clearInterval(arrest.cprTimer);
+                if (arrest.epiTimer) clearInterval(arrest.epiTimer);
+
+                app.log(`--- ${reason.toUpperCase()} ---`, 'System');
+                document.getElementById('end-time').innerText = document.getElementById('total-time').innerText;
+                document.getElementById('end-title').innerText = reason;
+
+                app.setView('v-summary');
+                app.setLogFormat('chrono'); // Default
+                app.guide("Session Ended", "Data Preserved", "g-def");
+            },
+
+            setLogFormat: (fmt) => {
+                app.logFormat = fmt;
+                document.getElementById('btn-fmt-chrono').classList.toggle('active-fmt', fmt === 'chrono');
+                document.getElementById('btn-fmt-soap').classList.toggle('active-fmt', fmt === 'soap');
+
+                app.renderFinalLog();
+            },
+
+            renderFinalLog: () => {
+                const d = new Date();
+                const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+                let content = "";
+
+                if (app.logFormat === 'soap') {
+                    content = app.generateSOAP();
+                } else {
+                    const logText = app.logData.map(l => `[${l.timestamp}] T+${l.elapsed} ${l.msg}`).join('\n');
+                    content = `PALS RECORD ${dateStr}\n` + logText;
+                }
+
+                document.getElementById('final-log').value = content;
+            },
+
+            generateSOAP: () => {
+                const startTime = app.logData[0]?.timestamp || '--:--';
+                const endTime = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+
+                let shockCount = 0;
+                let lastShockJ = 0;
+                let drugSummary = {};
+                let vitals = [];
+                let airway = 'Not Recorded';
+                let access = 'Not Recorded';
+
+                app.logData.forEach(log => {
+                    if (log.type === 'Shock') {
+                        shockCount++;
+                        const match = log.msg.match(/(\d+)J/);
+                        if (match) lastShockJ = match[1];
+                    }
+                    if (log.type === 'Epi' || log.type === 'Anti' || log.type === 'Atropine' || log.type === 'Generic') {
+                        let key = log.msg;
+                        if (log.msg.includes('Epinephrine') && log.msg.includes('mg/kg')) key = `Epinephrine 0.01mg/kg`;
+                        else if (log.msg.includes('Amiodarone')) key = `Amiodarone 5mg/kg`;
+                        else if (log.msg.includes('Lidocaine')) key = `Lidocaine 1mg/kg`;
+                        else if (log.msg.includes('Atropine')) key = `Atropine 0.02mg/kg`;
+                        else if (log.msg.includes('Adenosine') && log.msg.includes('0.1')) key = `Adenosine 0.1mg/kg`;
+                        else if (log.msg.includes('Adenosine') && log.msg.includes('0.2')) key = `Adenosine 0.2mg/kg`;
+                        if (log.type !== 'Generic' || key !== log.msg) {
+                            drugSummary[key] = (drugSummary[key] || 0) + 1;
+                        }
+                    }
+                    if (log.msg.includes('Airway')) airway = 'Established';
+                    if (log.msg.includes('Intravenous') || log.msg.includes('IV/IO Access')) access = 'Established';
+                    if (log.type === 'Vitals') vitals.push(log.msg);
+                });
+
+                let text = `PALS SUMMARY REPORT\n`;
+                text += `---------------------------\n`;
+                text += `WEIGHT  : ${w}kg\n`;
+                text += `TIMELINE: ${startTime} - ${endTime}\n`;
+                text += `OUTCOME : ${app.endReason}\n`;
+                text += `---------------------------\n`;
+                text += `[PROCEDURES]\n`;
+                text += `• Shocks  : ${shockCount} (Last: ${lastShockJ > 0 ? lastShockJ + 'J' : 'N/A'})\n`;
+                text += `• Airway  : ${airway}\n`;
+                text += `• Access  : ${access}\n\n`;
+                text += `[MEDICATIONS]\n`;
+                if (Object.keys(drugSummary).length === 0) text += `• None\n`;
+                for (let [drug, count] of Object.entries(drugSummary)) {
+                    text += `• ${drug}: ${count} dose(s)\n`;
+                }
+                if (vitals.length > 0) {
+                    text += `\n[LAST VITALS]\n• ${vitals[vitals.length - 1]}\n`;
+                }
+                return text;
+            },
+
+            showRhythmChange: () => { document.getElementById('modal-change').style.display = 'flex'; },
+
+            changeToNormal: () => { app.endCode('Ended: Normal Sinus Rhythm'); },
+            changeToBrady: () => {
+                app.clearTimeouts();
+                app.closeModals();
+                app.log('Rhythm Change: Bradycardia', 'System');
+                app.startModule('BRADY');
+            },
+            changeToTachy: () => {
+                app.clearTimeouts();
+                app.closeModals();
+                app.log('Rhythm Change: Tachycardia', 'System');
+                app.startModule('TACHY');
+            },
+            changeToArrestType: (type) => {
+                app.clearTimeouts();
+                app.closeModals();
+                app.log(`Rhythm Change: ${type}`, 'System');
+                app.startModule(type);
+            },
+
+            rosc: () => {
+                app.log("ROSC Achieved - Starting Post-Cardiac Arrest Care", 'System');
+                app.clearTimeouts();
+                if (arrest.cprTimer) clearInterval(arrest.cprTimer);
+                if (arrest.epiTimer) clearInterval(arrest.epiTimer);
+                app.closeModals();
+
+                app.setView('v-rosc-care');
+                app.guide("ROSC Care", "Optimize Ventilation & Oxygenation\nTreat Hypotension", "g-safe");
+            },
+
+            logVitals: () => {
+                const hr = document.getElementById('rosc-hr').value;
+                const sbp = document.getElementById('rosc-sbp').value;
+                const dbp = document.getElementById('rosc-dbp').value;
+                const spo2 = document.getElementById('rosc-spo2').value;
+
+                if (!hr && !sbp && !dbp && !spo2) return;
+
+                const msg = `Vitals: HR ${hr || '-'}, BP ${sbp || '-'}/${dbp || '-'}, SpO2 ${spo2 || '-'}%`;
+                app.log(msg, 'Vitals');
+
+                document.getElementById('rosc-hr').value = '';
+                document.getElementById('rosc-sbp').value = '';
+                document.getElementById('rosc-dbp').value = '';
+                document.getElementById('rosc-spo2').value = '';
+            },
+
+            copyFinalLog: () => {
+                const txt = document.getElementById('final-log').value;
+                const doCopy = () => { alert('Copied!'); };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(txt).then(doCopy).catch(() => {
+                        const el = document.getElementById('final-log'); el.select(); document.execCommand('copy'); doCopy();
+                    });
+                } else {
+                    const el = document.getElementById('final-log'); el.select(); document.execCommand('copy'); doCopy();
+                }
+            },
+
+            quickCopy: () => {
+                const d = new Date();
+                const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+                const logText = app.logData.map(l => `[${l.timestamp}] T+${l.elapsed} ${l.msg}`).join('\n');
+                const txt = `PALS RECORD ${dateStr}\n` + logText;
+
+                const showTag = () => {
+                    const tag = document.getElementById('copy-tag');
+                    tag.classList.add('show-tag');
+                    setTimeout(() => tag.classList.remove('show-tag'), 2000);
+                };
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(txt).then(showTag).catch(() => {
+                        const el = document.getElementById('temp-copy'); el.value = txt; el.select(); document.execCommand('copy'); showTag();
+                    });
+                } else {
+                    const el = document.getElementById('temp-copy'); el.value = txt; el.select(); document.execCommand('copy'); showTag();
+                }
+            },
+
+            hardReset: () => {
+                // Clean up any existing timer
+                if (app.timer) clearInterval(app.timer);
+                app.timer = null;
+
+                app.clearTimeouts();
+                app.startTime = null;
+                app.mode = null;
+                app.logData = [];
+                app.viewHistory = [];
+                app.currentView = 'v-home';
+
+                arrest.shockCount = 0;
+                arrest.epiCount = 0;
+                arrest.epiSecs = 0;
+                arrest.cprSecs = 120;
+                arrest.drugDoseStep = 0;
+                if (arrest.cprTimer) clearInterval(arrest.cprTimer);
+                if (arrest.epiTimer) clearInterval(arrest.epiTimer);
+                arrest.epiTimer = null;
+                arrest.lastEpiTime = 0;
+                arrest.type = null;
+
+                brady.atropineCount = 0;
+                if (brady.atropineTimer) clearInterval(brady.atropineTimer);
+                brady.atropineTimer = null;
+                brady.atropineSecs = 0;
+
+                document.getElementById('log-list').innerHTML = '';
+
+                // Force reset display
+                document.getElementById('total-time').innerText = "00:00";
+
+                document.getElementById('t-epi').innerText = "00:00";
+                document.getElementById('t-epi').style.color = "var(--c-blue)";
+                document.getElementById('val-shocks').innerText = "0";
+
+                app.resetButtonState('btn-epi', 'Epinephrine', 'sub-epi', '0.01 mg/kg IV/IO #0');
+                document.getElementById('btn-epi').classList.add('bg-blue');
+
+                app.resetButtonState('btn-anti', 'Amiodarone', 'sub-anti', 'Wait...');
+                document.getElementById('btn-anti').classList.add('bg-blue', 'locked');
+
+                // Reset tachy cardioversion buttons
+                const tachyBtns = document.querySelectorAll('#v-tachy-unstable-select .action-btn');
+                tachyBtns.forEach(btn => {
+                    btn.classList.remove('given-state', 'urgent');
+                    btn.style.animation = '';
+                });
+                const c1 = document.getElementById('btn-cardio1');
+                if (c1) { c1.innerHTML = `1st Cardioversion<span id="sub-cardio1" class="btn-sub">0.5-1 J/kg</span>`; c1.classList.remove('given-state'); c1.classList.add('suggested'); }
+                const c2 = document.getElementById('btn-cardio2');
+                if (c2) { c2.innerHTML = `2nd Cardioversion<span id="sub-cardio2" class="btn-sub">2 J/kg</span>`; c2.classList.remove('given-state'); c2.classList.add('dimmed'); }
+                const sed = document.getElementById('btn-sedation');
+                if (sed) { sed.innerHTML = `💉 Sedation (Dormicum)<span id="sub-sedation" class="btn-sub">0.1 mg/kg IV</span>`; sed.classList.remove('given-state'); sed.classList.add('suggested'); }
+
+                // Reset tachy-content for stable tachy
+                document.getElementById('tachy-content').innerHTML = '';
+
+                // Reset all given-state buttons in all views
+                document.querySelectorAll('.given-state').forEach(el => {
+                    el.classList.remove('given-state');
+                });
+
+                brady.epiCount = 0;
+                brady.atropineCount = 0;
+
+                document.getElementById('t-cpr').innerText = "02:00";
+                document.getElementById('btn-back').classList.add('hidden-back');
+                app.setView('v-home');
+                app.guide("PALS 2025", "請先輸入體重 (kg)", "g-def");
+            },
+
+            setView: (id) => {
+                if (app.currentView && app.currentView !== id) app.viewHistory.push(app.currentView);
+                app.currentView = id;
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                const backBtn = document.getElementById('btn-back');
+                if (id === 'v-home' || id === 'v-summary') backBtn.classList.add('hidden-back');
+                else backBtn.classList.remove('hidden-back');
+            },
+
+            goBack: () => {
+                // Safety check for back button
+                app.confirmAction("Go back to previous step?", () => {
+                    if (app.viewHistory.length === 0) return;
+                    if (app.currentView === 'v-arrest-loop') {
+                        if (arrest.cprTimer) { clearInterval(arrest.cprTimer); arrest.cprTimer = null; }
+                    }
+                    const prev = app.viewHistory.pop();
+                    app.currentView = prev;
+                    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                    document.getElementById(prev).classList.add('active');
+                    const backBtn = document.getElementById('btn-back');
+                    if (prev === 'v-home' || prev === 'v-summary' || app.viewHistory.length === 0) backBtn.classList.add('hidden-back');
+
+                    // Attempt to delete the last log entry if it was a system log for that view (Simplified approach)
+                    app.undoLast(); // Blindly undo the last log which represents the step we are leaving
+                    app.log('Returned to previous step', 'System');
+                });
+            },
+
+            guide: (main, sub, state) => {
+                const g = document.getElementById('guide-box');
+                document.getElementById('g-main').innerText = main;
+                document.getElementById('g-sub').innerText = sub;
+
+                // Clear old state classes
+                g.className = 'guide';
+                g.classList.add(state);
+
+                // Handle CPR flash animation logic separately
+                if (main.includes("CPR")) {
+                    document.getElementById('g-main').classList.add("flash-cpr");
+                } else {
+                    document.getElementById('g-main').classList.remove("flash-cpr");
+                }
+            },
+
+            fmtTime: (s) => {
+                const m = Math.floor(s / 60).toString().padStart(2, '0');
+                const sc = (s % 60).toString().padStart(2, '0');
+                return `${m}:${sc}`;
+            }
+        };
+
+        // --- ARREST MODULE (PALS - Weight-Based) ---
+        const arrest = {
+            type: null,
+            shockCount: 0,
+            cprTimer: null,
+            cprSecs: 120,
+            epiTimer: null,
+            epiSecs: 0,
+            epiCount: 0,
+            lastEpiTime: 0,
+            drugType: 'Amio',
+            drugDoseStep: 0,
+
+            getShockEnergy: (shockNum) => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                if (shockNum === 1) return { jPerKg: 2, energy: Math.round(w * 2) };
+                const e = Math.round(w * 4);
+                const max = Math.min(Math.round(w * 10), 360);
+                return { jPerKg: 4, energy: Math.min(e, max) };
+            },
+
+            init: (type) => {
+                if (arrest.epiTimer) { clearInterval(arrest.epiTimer); arrest.epiTimer = null; }
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                const epiDose = Math.min(w * 0.01, 1).toFixed(2);
+
+                if (type === 'PEA' || type === 'Asystole') {
+                    arrest.epiSecs = 180;
+                    arrest.startEpiTimer();
+                } else {
+                    document.getElementById('t-epi').innerText = "--:--";
+                    document.getElementById('t-epi').style.color = "#555";
+                    app.resetButtonState('btn-epi', `Epinephrine ${epiDose}mg`, 'sub-epi', 'Wait...');
+                    document.getElementById('btn-epi').classList.add('bg-blue', 'dimmed');
+                    app.resetButtonState('btn-anti', 'Amiodarone', 'sub-anti', 'Wait...');
+                    document.getElementById('btn-anti').classList.add('bg-blue', 'dimmed');
+                }
+                arrest.setRhythm(type, true);
+            },
+
+            setRhythm: (type, isInit = false) => {
+                const previousType = arrest.type;
+                arrest.type = type;
+                app.log(`Rhythm: ${type}`, 'System');
+                const btnAnti = document.getElementById('btn-anti');
+                const btnToggle = document.getElementById('btn-toggle');
+
+                if (type === 'VF' || type === 'pVT') {
+                    btnAnti.style.display = 'flex';
+                    btnToggle.style.display = 'flex';
+                    const info = arrest.getShockEnergy(arrest.shockCount + 1);
+                    app.setView('v-arrest-charge');
+                    app.guide("SHOCK ADVISED", `Charge ${info.jPerKg} J/kg (${info.energy}J) • CPR 15:2`, "g-alert");
+                    document.getElementById('charge-ctx').innerText = `${type} - SHOCK ${info.jPerKg} J/kg (${info.energy}J)`;
+                    document.getElementById('sub-shock').innerText = `${info.jPerKg} J/kg = ${info.energy}J`;
+                    if (arrest.epiTimer) { clearInterval(arrest.epiTimer); arrest.epiTimer = null; }
+                } else {
+                    btnAnti.style.display = 'none';
+                    btnToggle.style.display = 'none';
+                    if (type === 'PEA' || type === 'Asystole') {
+                        if (!isInit && (previousType === 'VF' || previousType === 'pVT')) {
+                            arrest.epiSecs = 180;
+                            arrest.startEpiTimer();
+                            app.log("Switched to Non-Shockable: Epinephrine Due Now", 'System');
+                        }
+                    }
+                    arrest.startCPR();
+                }
+            },
+
+            deliverShock: () => {
+                arrest.shockCount++;
+                const info = arrest.getShockEnergy(arrest.shockCount);
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                app.log(`Shock ${arrest.shockCount} Delivered (${info.jPerKg} J/kg × ${w}kg = ${info.energy}J)`, 'Shock');
+                app.log(`CPR Start (Cycle ${arrest.shockCount})`, 'System');
+                document.getElementById('val-shocks').innerText = arrest.shockCount;
+                arrest.startCPR(true);
+            },
+
+            logCPRCharging: () => {
+                app.log("CPR Started (Charging Phase)", 'System');
+                if (!document.getElementById('loop-status').innerText.includes("CYCLE")) {
+                    document.getElementById('loop-status').innerText = `${arrest.type} - CPR (Charging)`;
+                    app.log(`CPR Cycle #${arrest.shockCount + 1} Started (Charging Phase)`, 'System');
+                }
+            },
+
+            startCPR: (fromShock = false) => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                const epiDose = Math.min(w * 0.01, 1).toFixed(2);
+                app.setView('v-arrest-loop');
+                app.guide("CPR IN PROGRESS", "Push Hard & Fast (110bpm) • 15:2", "g-cpr");
+                document.getElementById('loop-status').innerText = `${arrest.type} - CPR CYCLE #${arrest.shockCount + (fromShock ? 0 : 1)}`;
+                if (!fromShock) app.log(`CPR Start (Non-Shockable) Cycle #${arrest.shockCount + 1}`, 'System');
+
+                const btnAnti = document.getElementById('btn-anti');
+                const btnEpi = document.getElementById('btn-epi');
+                app.resetButtonState('btn-epi', `Epinephrine ${epiDose}mg`, 'sub-epi', 'Wait...');
+                btnEpi.classList.add('bg-blue');
+                const antiName = arrest.drugType === 'Amio' ? 'Amiodarone' : 'Lidocaine';
+                app.resetButtonState('btn-anti', antiName, 'sub-anti', 'Wait...');
+                btnAnti.classList.add('bg-blue');
+
+                if (arrest.type === 'VF' || arrest.type === 'pVT') {
+                    btnAnti.classList.add('dimmed', 'locked');
+                    btnEpi.classList.add('dimmed', 'locked');
+                    if (arrest.shockCount >= 2 && arrest.shockCount % 2 === 0) {
+                        btnEpi.classList.remove('locked', 'dimmed');
+                        btnEpi.classList.add('urgent', 'bg-red', 'suggested');
+                        btnEpi.classList.remove('bg-blue');
+                        document.getElementById('sub-epi').innerText = `Give Now! 0.01mg/kg (#${arrest.epiCount + 1})`;
+                    }
+                    else if (arrest.shockCount >= 3 && arrest.shockCount % 2 !== 0) {
+                        btnAnti.classList.remove('locked', 'dimmed');
+                        btnAnti.classList.add('urgent', 'bg-red', 'suggested');
+                        btnAnti.classList.remove('bg-blue');
+                        if (arrest.drugType === 'Amio') {
+                            const maxS = arrest.drugDoseStep === 0 ? 300 : 150;
+                            const d = Math.min(Math.round(w * 5), maxS);
+                            document.getElementById('sub-anti').innerText = `${d}mg (5 mg/kg)`;
+                        } else {
+                            document.getElementById('sub-anti').innerText = `${Math.round(w * 1)}mg (1 mg/kg)`;
+                        }
+                    }
+                } else {
+                    arrest.updateEpiVisuals();
+                }
+
+                arrest.cprSecs = 120;
+                document.getElementById('cpr-slider').value = 120;
+                if (arrest.cprTimer) clearInterval(arrest.cprTimer);
+                arrest.cprTimer = setInterval(() => {
+                    arrest.cprSecs--;
+                    document.getElementById('t-cpr').innerText = app.fmtTime(arrest.cprSecs);
+                    document.getElementById('cpr-slider').value = arrest.cprSecs;
+                    if (arrest.cprSecs <= 0) {
+                        clearInterval(arrest.cprTimer);
+                        document.getElementById('modal-alert').style.display = 'flex';
+                    }
+                }, 1000);
+            },
+
+            sliderInput: (val) => { document.getElementById('t-cpr').innerText = app.fmtTime(val); },
+            sliderChange: (val) => {
+                const oldSecs = arrest.cprSecs;
+                arrest.cprSecs = parseInt(val);
+                const diff = oldSecs - arrest.cprSecs;
+                if ((arrest.type === 'PEA' || arrest.type === 'Asystole') && diff > 0) {
+                    arrest.epiSecs += diff;
+                    document.getElementById('t-epi').innerText = app.fmtTime(arrest.epiSecs);
+                    arrest.updateEpiVisuals();
+                }
+                app.log(`[TEST] Skipped CPR to ${val}s`, 'System');
+            },
+
+            updateEpiVisuals: () => {
+                const btn = document.getElementById('btn-epi');
+                const t = document.getElementById('t-epi');
+                t.innerText = app.fmtTime(arrest.epiSecs);
+                if (arrest.epiSecs >= 180) {
+                    btn.classList.add('urgent', 'bg-red', 'suggested');
+                    btn.classList.remove('bg-blue', 'dimmed', 'locked', 'bg-grey');
+                    btn.style.animation = 'urgent-flash 0.6s infinite alternate';
+                    document.getElementById('sub-epi').innerText = `DUE NOW! 0.01mg/kg (#${arrest.epiCount})`;
+                    t.style.color = 'var(--c-red)';
+                } else {
+                    btn.classList.remove('urgent', 'bg-red', 'suggested', 'bg-blue');
+                    btn.classList.add('bg-grey', 'dimmed', 'locked');
+                    btn.style.animation = '';
+                    document.getElementById('sub-epi').innerText = `0.01mg/kg IV/IO (q3-5m) #${arrest.epiCount}`;
+                    t.style.color = 'var(--c-blue)';
+                }
+            },
+
+            startEpiTimer: () => {
+                if (arrest.epiTimer) clearInterval(arrest.epiTimer);
+                arrest.updateEpiVisuals();
+                arrest.epiTimer = setInterval(() => {
+                    arrest.epiSecs++;
+                    arrest.updateEpiVisuals();
+                }, 1000);
+            },
+
+            giveEpi: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                arrest.epiCount++;
+                arrest.lastEpiTime = Date.now();
+                const dose = Math.min(w * 0.01, 1).toFixed(2);
+                const vol = (w * 0.1).toFixed(1);
+                app.log(`Epinephrine ${dose}mg IV/IO (0.01mg/kg, ${vol}ml 1:10,000) (#${arrest.epiCount})`, 'Epi');
+                arrest.epiSecs = 0;
+                document.getElementById('t-epi').innerText = "00:00";
+                document.getElementById('t-epi').style.color = 'var(--c-blue)';
+                arrest.updateEpiVisuals();
+            },
+
+            toggleDrug: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                if (arrest.drugType === 'Amio') {
+                    arrest.drugType = 'Lido';
+                    document.getElementById('lbl-drug').innerText = 'Amiodarone';
+                    document.getElementById('btn-anti').innerHTML = `Lidocaine<span id="sub-anti" class="btn-sub">...</span>`;
+                } else {
+                    arrest.drugType = 'Amio';
+                    document.getElementById('lbl-drug').innerText = 'Lidocaine';
+                    document.getElementById('btn-anti').innerHTML = `Amiodarone<span id="sub-anti" class="btn-sub">...</span>`;
+                }
+                const btn = document.getElementById('btn-anti');
+                const name = (arrest.drugType === 'Amio') ? 'Amiodarone' : 'Lidocaine';
+                let sub = 'Wait...';
+                if (btn.classList.contains('suggested') && w) {
+                    if (arrest.drugType === 'Amio') {
+                        const maxS = arrest.drugDoseStep === 0 ? 300 : 150;
+                        sub = `${Math.min(Math.round(w * 5), maxS)}mg (5 mg/kg)`;
+                    } else {
+                        sub = `${Math.round(w * 1)}mg (1 mg/kg)`;
+                    }
+                } else {
+                    if (btn.classList.contains('locked')) sub = 'Wait...';
+                    else sub = document.getElementById('sub-anti').innerText;
+                }
+                btn.innerHTML = `${name}<span id="sub-anti" class="btn-sub">${sub}</span>`;
+            },
+
+            giveAnti: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                const btn = document.getElementById('btn-anti');
+                const name = arrest.drugType === 'Amio' ? 'Amiodarone' : 'Lidocaine';
+                let doseText;
+                if (arrest.drugType === 'Amio') {
+                    const maxS = arrest.drugDoseStep === 0 ? 300 : 150;
+                    const d = Math.min(Math.round(w * 5), maxS);
+                    doseText = `${d}mg (5mg/kg)`;
+                    arrest.drugDoseStep++;
+                } else {
+                    doseText = `${Math.round(w * 1)}mg (1mg/kg)`;
+                }
+                app.log(`${name} ${doseText} IV/IO`, 'Anti', btn);
+            },
+
+            confirmCheck: () => {
+                document.getElementById('modal-alert').style.display = 'none';
+                app.log("Cycle End. Rhythm Check.", 'System');
+                app.setView('v-arrest-check');
+                app.guide("Rhythm Check", "Identify Rhythm", "g-def");
+            }
+        };
+
+        // --- BRADY MODULE (PALS) ---
+        const brady = {
+            epiCount: 0,
+            atropineCount: 0,
+            atropineTimer: null,
+            atropineSecs: 0,
+
+            init: (isStable) => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                app.setView('v-brady-action');
+                const div = document.getElementById('brady-content');
+
+                if (isStable) {
+                    app.log("Bradycardia: Stable (Adequate Perfusion)", 'System');
+                    app.guide("Stable Bradycardia", "Support ABCs • Oxygen • Observe", "g-safe");
+                    div.innerHTML = `
+                        <button class="action-btn bg-green" onclick="app.log('Support Airway/Breathing/Oxygenation', 'Generic', this)">Support ABCs / O2</button>
+                        <button class="action-btn bg-green" onclick="app.log('12-Lead EKG Done', 'Generic', this)">12-Lead EKG</button>
+                        <button class="action-btn bg-blue" onclick="app.log('Expert Consultation Requested', 'Generic', this)">Expert Consultation</button>
+                    `;
+                } else {
+                    const epiDose = Math.min(w * 0.01, 1).toFixed(2);
+                    const epiVol = (w * 0.1).toFixed(1);
+                    const atropineDose = Math.max(0.1, w * 0.02).toFixed(2);
+                    const atropineMax = w >= 40 ? '1mg (Adolescent)' : '0.5mg (Child)';
+
+                    app.log(`Unstable Bradycardia: HR < 60 + Poor Perfusion → CPR + Epi`, 'System');
+                    app.guide("Unstable Bradycardia", "CPR → Epinephrine\nOxygenation First!", "g-alert");
+
+                    div.innerHTML = `
+                        <div class="info-box">
+                            <div class="info-row"><span>Epinephrine</span> <span>${epiDose} mg (0.01 mg/kg)</span></div>
+                            <div class="info-row"><span>Volume (1:10,000)</span> <span>${epiVol} ml (0.1 ml/kg)</span></div>
+                            <div class="info-row"><span>Max single dose</span> <span>1 mg</span></div>
+                        </div>
+                        <button class="action-btn bg-red suggested" onclick="app.log('CPR Started (HR < 60 + Poor Perfusion) 15:2', 'Generic', this)">
+                            START CPR<span class="btn-sub">15:2 Ratio</span>
+                        </button>
+                        <div class="grid-2">
+                            <button id="btn-brady-epi" class="action-btn bg-blue suggested" onclick="brady.giveEpi()">
+                                Epinephrine ${epiDose}mg
+                                <span id="sub-brady-epi" class="btn-sub">0.01 mg/kg IV/IO (q3-5m) #0</span>
+                            </button>
+                            <button class="action-btn bg-green" style="background:#00695c;" onclick="app.log('Airway/Oxygenation Secured (Crucial!)', 'Generic', this)">
+                                Airway / O2<span class="btn-sub">Crucial Step!</span>
+                            </button>
+                        </div>
+                        <button class="action-btn bg-grey" onclick="app.log('IV/IO Access Secured', 'Generic', this)">IV/IO Access</button>
+                        <div class="section-header">VAGAL TONE / AV BLOCK?</div>
+                        <div class="grid-2">
+                            <button id="btn-brady-atropine" class="action-btn bg-dark" onclick="brady.giveAtropine()">
+                                Atropine ${atropineDose}mg
+                                <span id="sub-brady-atropine" class="btn-sub">0.02 mg/kg (Max ${atropineMax}) #0</span>
+                            </button>
+                            <button class="action-btn bg-yellow" onclick="app.log('Transcutaneous Pacing Started', 'Generic', this)">
+                                TCP (Pacing)<span class="btn-sub">If Refractory</span>
+                            </button>
+                        </div>
+                        <button class="action-btn bg-dark" style="margin-top:8px;" onclick="app.log('Treat Reversible Causes (H\\'s & T\\'s - esp. Hypoxia)', 'Generic', this)">
+                            H's & T's<span class="btn-sub">Identify & Treat Causes</span>
+                        </button>
+                    `;
+                }
+            },
+
+            giveEpi: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                brady.epiCount++;
+                const dose = Math.min(w * 0.01, 1).toFixed(2);
+                const vol = (w * 0.1).toFixed(1);
+                app.log(`Epinephrine ${dose}mg IV/IO (0.01mg/kg, ${vol}ml 1:10,000) (#${brady.epiCount})`, 'Epi');
+                const sub = document.getElementById('sub-brady-epi');
+                if (sub) sub.innerText = `0.01 mg/kg IV/IO (q3-5m) #${brady.epiCount}`;
+            },
+
+            giveAtropine: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                if (brady.atropineCount >= 2) return alert("Max Atropine Reached (2 doses)");
+                brady.atropineCount++;
+                const maxDose = w >= 40 ? 1 : 0.5;
+                const dose = Math.min(Math.max(0.1, w * 0.02), maxDose).toFixed(2);
+                app.log(`Atropine ${dose}mg IV (0.02mg/kg, Min 0.1mg, Max ${maxDose}mg) (#${brady.atropineCount})`, 'Atropine');
+                const btn = document.getElementById('btn-brady-atropine');
+                if (brady.atropineCount >= 2 && btn) {
+                    btn.classList.add('locked', 'given-state');
+                    btn.innerHTML = `Atropine<span class="btn-sub">Max Given (2 doses)</span>`;
+                } else {
+                    const sub = document.getElementById('sub-brady-atropine');
+                    if (sub) sub.innerText = `May repeat once #${brady.atropineCount}`;
+                }
+            }
+        };
+
+        // --- TACHY MODULE (PALS) ---
+        const tachy = {
+            sedationGiven: false,
+            cardioCount: 0,
+
+            init: (isStable) => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                if (!isStable) {
+                    tachy.sedationGiven = false;
+                    tachy.cardioCount = 0;
+                    app.setView('v-tachy-unstable-select');
+                    app.guide("Unstable Tachycardia", "Sedation → Synchronized Cardioversion", "g-alert");
+                    // Update dose info
+                    const sedDose = Math.min(w * 0.1, 5).toFixed(1);
+                    document.getElementById('sedation-info').innerText = `Dormicum ${sedDose}mg (0.1 mg/kg × ${w}kg)`;
+                    document.getElementById('sub-sedation').innerText = `${sedDose}mg (0.1 mg/kg)`;
+                    const c1Energy = Math.round(w * 1);
+                    document.getElementById('sub-cardio1').innerText = `0.5-1 J/kg (${Math.round(w * 0.5)}-${c1Energy}J)`;
+                    document.getElementById('sub-cardio2').innerText = `2 J/kg (${Math.round(w * 2)}J)`;
+                } else {
+                    app.setView('v-tachy-action');
+                    const div = document.getElementById('tachy-content');
+                    app.log("Tachycardia: Stable", 'System');
+                    app.guide("Assess QRS", "Is QRS > 0.09 sec?", "g-info");
+                    div.innerHTML = `
+                        <div class="grid-2">
+                            <button class="action-btn bg-green" onclick="tachy.narrowPre()">Narrow QRS<span class="btn-sub">≤ 0.09s (SVT)</span></button>
+                            <button class="action-btn bg-yellow" onclick="tachy.wide()">Wide QRS<span class="btn-sub">> 0.09s (VT)</span></button>
+                        </div>
+                    `;
+                }
+            },
+
+            giveSedation: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                const dose = Math.min(w * 0.1, 5).toFixed(1);
+                app.log(`Dormicum (Midazolam) ${dose}mg IV (0.1mg/kg) for Sedation`, 'Generic', document.getElementById('btn-sedation'));
+                tachy.sedationGiven = true;
+            },
+
+            cardiovert: (num) => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                tachy.cardioCount++;
+                let energy, jPerKg;
+                if (num === 1) {
+                    jPerKg = '0.5-1';
+                    energy = `${Math.round(w * 0.5)}-${Math.round(w * 1)}`;
+                } else {
+                    jPerKg = '2';
+                    energy = Math.round(w * 2);
+                }
+                app.log(`Synchronized Cardioversion #${tachy.cardioCount} (${jPerKg} J/kg = ${energy}J)`, 'Shock', document.getElementById(`btn-cardio${num}`));
+                if (num === 1) {
+                    const c2 = document.getElementById('btn-cardio2');
+                    c2.classList.remove('dimmed');
+                    c2.classList.add('suggested');
+                }
+            },
+
+            narrowPre: () => {
+                app.guide("Narrow QRS (SVT)", "Vagal → Adenosine", "g-info");
+                app.log("Tachycardia: Narrow QRS → SVT Flow", 'System');
+                tachy.narrow();
+            },
+
+            narrow: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                const adeno1 = Math.min(w * 0.1, 6).toFixed(1);
+                const adeno2 = Math.min(w * 0.2, 12).toFixed(1);
+                app.guide("SVT Protocol", "Vagal → Adenosine", "g-info");
+                document.getElementById('tachy-content').innerHTML = `
+                    <div class="col-flex">
+                        <button id="step1" class="action-btn bg-green suggested" onclick="tachy.step(1)">
+                            1. Vagal Maneuver<span class="btn-sub">Ice to face (infant) / Valsalva</span>
+                        </button>
+                        <button id="step2" class="action-btn bg-blue dimmed" onclick="tachy.step(2)">
+                            2. Adenosine ${adeno1}mg<span class="btn-sub">0.1 mg/kg (Max 6mg) Rapid IVP + Flush</span>
+                        </button>
+                        <button id="step3" class="action-btn bg-blue dimmed" onclick="tachy.step(3)">
+                            3. Adenosine ${adeno2}mg<span class="btn-sub">0.2 mg/kg (Max 12mg) Rapid IVP + Flush</span>
+                        </button>
+                        <button id="step4" class="action-btn bg-grey dimmed" onclick="tachy.step(4)">
+                            4. Consult Pediatric Cardiology
+                        </button>
+                    </div>
+                `;
+            },
+
+            step: (num) => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                if (num === 1) {
+                    app.log("Vagal Maneuver (Ice to face / Valsalva)", 'Generic', document.getElementById('step1'));
+                    document.getElementById('step2').classList.remove('dimmed');
+                    document.getElementById('step2').classList.add('suggested');
+                } else if (num === 2) {
+                    const dose = Math.min(w * 0.1, 6).toFixed(1);
+                    app.log(`Adenosine ${dose}mg IVP (0.1mg/kg, Max 6mg) + Rapid Flush`, 'Generic', document.getElementById('step2'));
+                    document.getElementById('step3').classList.remove('dimmed');
+                    document.getElementById('step3').classList.add('suggested');
+                } else if (num === 3) {
+                    const dose = Math.min(w * 0.2, 12).toFixed(1);
+                    app.log(`Adenosine ${dose}mg IVP (0.2mg/kg, Max 12mg) + Rapid Flush`, 'Generic', document.getElementById('step3'));
+                    document.getElementById('step4').classList.remove('dimmed');
+                    document.getElementById('step4').classList.add('suggested');
+                } else {
+                    app.log("Consult Pediatric Cardiology", 'Generic', document.getElementById('step4'));
+                }
+            },
+
+            wide: () => {
+                const w = parseFloat(document.getElementById('pt-weight').value) || 0;
+                app.guide("Wide QRS (VT)", "Consult → Amiodarone / Procainamide", "g-alert");
+                app.log("Tachycardia: Wide QRS → VT Protocol", 'System');
+                const amioDose = Math.min(Math.round(w * 5), 300);
+                const procDose = Math.round(w * 15);
+                document.getElementById('tachy-content').innerHTML = `
+                    <div class="info-box info-highlight">
+                        <div class="info-warning" style="text-align:center;">Join Consultation Immediately</div>
+                        <div class="info-row"><span class="txt-yellow">Amiodarone</span> <span>${amioDose}mg (5 mg/kg) over 20-60 min</span></div>
+                        <div class="info-row"><span class="txt-yellow">Procainamide</span> <span>${procDose}mg (15 mg/kg) over 30-60 min</span></div>
+                    </div>
+                    <button class="action-btn bg-dark" onclick="tachy.tryAdenosineWide()">
+                        Try Adenosine?<span class="btn-sub">If Regular & Monomorphic</span>
+                    </button>
+                    <button class="action-btn bg-blue suggested" style="margin-top:8px;" onclick="app.log('Amiodarone ${amioDose}mg IV over 20-60 min (5mg/kg)', 'Generic', this)">
+                        Amiodarone<span class="btn-sub">${amioDose}mg (5 mg/kg) IV over 20-60 min</span>
+                    </button>
+                    <button class="action-btn bg-blue" style="margin-top:8px;" onclick="app.log('Procainamide ${procDose}mg IV over 30-60 min (15mg/kg)', 'Generic', this)">
+                        Procainamide<span class="btn-sub">${procDose}mg (15 mg/kg) IV over 30-60 min</span>
+                    </button>
+                    <button class="action-btn bg-dark" style="margin-top:8px;" onclick="app.log('Treat Reversible Causes (Electrolytes, Toxins)', 'Generic', this)">
+                        Treat Reversible Causes<span class="btn-sub">Electrolytes, Toxins</span>
+                    </button>
+                `;
+            },
+
+            tryAdenosineWide: () => {
+                app.log("Attempting Adenosine for Regular Wide QRS", 'System');
+                tachy.narrow();
+            },
+
+            // Legacy stubs for compatibility
+            escalate: () => { },
+            afib: () => { },
+            aflutter: () => { },
+            afibCommon: () => { },
+            afibHf: () => { },
+            wideReg: () => { tachy.narrow(); },
+            wideIrreg: () => { tachy.wide(); }
+        };
+    </script>
+</body>
+
+</html>
