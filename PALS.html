@@ -1490,7 +1490,7 @@
     <!-- VIEWPORT -->
     <div class="viewport">
 
-        <!-- 1. HOME: WEIGHT ENTRY -->
+        <!-- 1. HOME: WEIGHT + AGE ENTRY -->
         <div id="v-home" class="view active">
             <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px;">
                 <div class="input-grp">
@@ -1498,10 +1498,15 @@
                     <input type="number" id="pt-weight" placeholder="Enter kg"
                         style="font-size:2rem; font-weight:bold; text-align:center;">
                 </div>
+                <div class="input-grp">
+                    <label>AGE (years) 年齡</label>
+                    <input type="number" id="pt-age" placeholder="Enter years (0 = <1歲)" step="0.5" min="0"
+                        style="font-size:2rem; font-weight:bold; text-align:center;">
+                </div>
                 <button class="action-btn bg-green suggested" style="font-size:1.3rem; padding:18px;"
-                    onclick="app.confirmWeight()">
+                    onclick="app.confirmStart()">
                     ▶ START
-                    <span class="btn-sub">確認體重，開始記錄</span>
+                    <span class="btn-sub">確認體重與年齡，開始記錄</span>
                 </button>
             </div>
         </div>
@@ -1636,21 +1641,20 @@
         <!-- 5. STABILITY CHECK -->
         <div id="v-stability" class="view">
             <div class="dash" style="border-color: var(--c-red);">
-                <div class="ctx-bar" style="border-color: var(--c-red); color: var(--c-red);">ASSESS STABILITY
-                    (有無昏痛喘休克血壓低)</div>
-                <div style="font-size:1.1rem; font-weight:bold; color:var(--c-red); line-height:1.6; padding:10px;">
-                    🔴 昏 (Altered Mental Status / AMS)<br>🔴 痛 (Chest Pain / Discomfort)<br>🔴 喘 (Respiratory Distress /
-                    Failure)<br>🔴 休克 (Shock: Cool skin, weak pulse, CRT &gt; 2s)<br>🔴 血壓低 (SBP &lt; 70 + 2×age)
+                <div class="ctx-bar" style="border-color: var(--c-red); color: var(--c-red);">ASSESS STABILITY 評估穩定性
+                </div>
+                <div id="stability-criteria"
+                    style="font-size:1.1rem; font-weight:bold; color:var(--c-red); line-height:1.8; padding:10px;">
+                    🔴 昏 (Altered Mental Status)<br>🔴 休克 (Shock: CRT>2s, weak pulse)<br>🔴 低血壓 (SBP &lt; --)
                 </div>
             </div>
             <div id="symptom-selector" style="display:none; grid-template-columns: 1fr 1fr; gap:8px;">
-                <button class="action-btn bg-dark" onclick="app.logSymptom('Altered Mental Status (昏)')">昏</button>
-                <button class="action-btn bg-dark" onclick="app.logSymptom('Chest Pain / Discomfort (痛)')">痛</button>
-                <button class="action-btn bg-dark"
-                    onclick="app.logSymptom('Respiratory Distress / Failure (喘)')">喘</button>
-                <button class="action-btn bg-dark" onclick="app.logSymptom('Shock: Cool skin, CRT>2s (休克)')">休克</button>
                 <button class="action-btn bg-dark" style="grid-column:span 2"
-                    onclick="app.logSymptom('Hypotension: SBP < 70+2×age (血壓低)')">血壓低</button>
+                    onclick="app.logSymptom('Altered Mental Status (昏)')">昏 AMS</button>
+                <button class="action-btn bg-dark" style="grid-column:span 2"
+                    onclick="app.logSymptom('Shock: CRT>2s, weak pulse (休克)')">休克 Shock</button>
+                <button id="btn-hypotension" class="action-btn bg-dark" style="grid-column:span 2"
+                    onclick="app.logSymptom(this.dataset.logText)">低血壓</button>
                 <button class="action-btn bg-green" style="grid-column:span 2; margin-top:10px;"
                     onclick="app.handleStability(true)">STABLE</button>
             </div>
@@ -1864,12 +1868,28 @@
                 return w;
             },
 
-            confirmWeight: () => {
+            getAge: () => {
+                const a = parseFloat(document.getElementById('pt-age').value);
+                if (a === null || a === undefined || isNaN(a) || a < 0) { alert('請輸入年齡 (years)'); return null; }
+                return a;
+            },
+
+            getNormalSBP: (age) => {
+                if (age < 1) return 70;
+                if (age <= 10) return Math.round(70 + 2 * age);
+                return 90;
+            },
+
+            confirmStart: () => {
                 const w = app.getWeight();
                 if (w === null) return;
+                const age = app.getAge();
+                if (age === null) return;
                 if (!app.startTime) app.initTimer();
-                app.log(`Patient Weight: ${w} kg`, 'System');
-                app.guide("PALS 2025", `Weight: ${w}kg — 輸入心率`, "g-info");
+                const sbp = app.getNormalSBP(age);
+                const ageLabel = age < 1 ? `${Math.round(age * 12)}m` : `${age}y`;
+                app.log(`Patient: Weight ${w}kg, Age ${ageLabel}, Normal SBP ≥${sbp} mmHg`, 'System');
+                app.guide("PALS 2025", `${w}kg / ${ageLabel} — SBP ≥${sbp} mmHg`, "g-info");
                 app.setView('v-select');
             },
 
@@ -1900,19 +1920,31 @@
                     arrest.init(mod);
                 } else if (mod === 'BRADY') {
                     app.mode = 'brady';
-                    app.guide("Assess Stability", "HR < 60 + Poor Perfusion?", "g-info");
-                    app.setView('v-stability');
-                    document.getElementById('symptom-selector').style.display = 'grid';
+                    app.guide("Assess Stability", "有無昏、休克、低血壓?", "g-info");
+                    app.showStability();
                 } else if (mod === 'TACHY') {
                     app.mode = 'tachy';
-                    app.guide("Assess Stability", "有無昏痛喘休克血壓低", "g-info");
-                    app.setView('v-stability');
-                    document.getElementById('symptom-selector').style.display = 'grid';
+                    app.guide("Assess Stability", "有無昏、休克、低血壓?", "g-info");
+                    app.showStability();
                 }
             },
 
             toggleTheme: () => {
                 document.body.classList.toggle('day-mode');
+            },
+
+            showStability: () => {
+                const age = app.getAge();
+                const sbp = app.getNormalSBP(age !== null ? age : 0);
+                // Update criteria text
+                document.getElementById('stability-criteria').innerHTML =
+                    `🔴 昏 (Altered Mental Status)<br>🔴 休克 (Shock: CRT>2s, weak pulse)<br>🔴 低血壓 (SBP &lt; ${sbp} mmHg)`;
+                // Update hypotension button
+                const btn = document.getElementById('btn-hypotension');
+                btn.textContent = `低血壓 Hypotension (SBP < ${sbp})`;
+                btn.dataset.logText = `Hypotension: SBP < ${sbp} mmHg (低血壓)`;
+                app.setView('v-stability');
+                document.getElementById('symptom-selector').style.display = 'grid';
             },
 
             handleStability: (isStable) => {
