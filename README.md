@@ -27,7 +27,7 @@
 
 ## Usage
 
-1. 開啟 `PALS.html`（或使用 [GitHub Pages 線上版](https://yourusername.github.io/PALS/)）
+1. 開啟 `PALS.html`（或使用 [GitHub Pages 線上版](https://rickyrickyrickyyu.github.io/PALS/)）
 2. 輸入病患體重 (kg) → 點擊 START
 3. 輸入心率 (可選) → 選擇對應模組
 4. 依畫面引導操作
