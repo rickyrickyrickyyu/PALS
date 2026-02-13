@@ -2675,7 +2675,7 @@
         };
 
         // --- BRADY MODULE (PALS) ---
-const brady = {
+        const brady = {
             epiCount: 0,
             atropineCount: 0,
             atropineTimer: null,
@@ -2714,9 +2714,9 @@ const brady = {
                     dash.style.display = 'none';
                     brady.airwayGiven = false;
                     brady.cprCycle = 0;
-                    
+
                     // Initialize Epi timer to "Due Now" state (3 mins) but don't start ticking until CPR starts
-                    brady.epiSecs = 180; 
+                    brady.epiSecs = 180;
 
                     div.innerHTML = `
                         <div class="info-box">
@@ -2827,9 +2827,9 @@ const brady = {
                 const btn = document.getElementById('btn-brady-epi');
                 const t = document.getElementById('t-brady-epi');
                 if (!btn || !t) return;
-                
+
                 t.innerText = app.fmtTime(brady.epiSecs);
-                
+
                 // PALS: Epi every 3-5 min. We use 3 min (180s) as "Due".
                 if (brady.epiSecs >= 180) {
                     btn.classList.add('urgent', 'bg-red', 'suggested');
@@ -2872,15 +2872,22 @@ const brady = {
                 const btn = document.getElementById('btn-brady-tcp');
                 if (!btn) return;
                 app.log('Transcutaneous Pacing Started', 'Generic');
-                // Dim for 2 seconds then restore
-                // REQUIREMENT: Allow repeat, don't stay ticked, just dim 2s.
+
+                // Visual Feedback: Dim for 2s
                 btn.style.opacity = '0.4';
                 btn.style.pointerEvents = 'none';
+
                 setTimeout(() => {
+                    // Restore interactivity
                     btn.style.opacity = '';
                     btn.style.pointerEvents = '';
-                    // Force remove given-state just in case
-                    btn.classList.remove('given-state'); 
+
+                    // Restore Original Appearance (remove checkmark state)
+                    btn.classList.remove('given-state');
+                    btn.classList.add('bg-yellow'); // Ensure background color is restored
+
+                    // Restore Original Text Content
+                    btn.innerHTML = `TCP (Pacing)<span id="sub-brady-tcp" class="btn-sub">If Refractory</span>`;
                 }, 2000);
             },
 
