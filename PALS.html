@@ -1662,6 +1662,20 @@
 
         <!-- BRADY VIEW -->
         <div id="v-brady-action" class="view">
+            <!-- Brady CPR Dashboard (hidden until CPR started) -->
+            <div id="brady-cpr-dash" class="dash" style="display:none;">
+                <div class="ctx-bar" id="brady-loop-status">BRADY CPR</div>
+                <div class="timer-row">
+                    <div class="t-box">
+                        <span class="t-lbl">CPR</span>
+                        <span id="t-brady-cpr" class="t-val">02:00</span>
+                    </div>
+                    <div class="t-box">
+                        <span class="t-lbl">EPI (3m)</span>
+                        <span id="t-brady-epi" class="t-val" style="color:var(--c-blue)">03:00</span>
+                    </div>
+                </div>
+            </div>
             <div id="brady-content" class="col-flex"></div>
             <div class="grid-2" style="margin-top:auto">
                 <button class="action-btn bg-grey" onclick="app.showRhythmChange()">Rhythm Change</button>
@@ -1816,6 +1830,15 @@
             STOP CPR!<br>CHECK RHYTHM</div>
         <button class="action-btn bg-yellow suggested" style="width: 80%; height: 90px; font-size:1.5rem; color:black;"
             onclick="arrest.confirmCheck()">OK, CHECKING</button>
+    </div>
+
+    <!-- BRADY CPR CHECK MODAL -->
+    <div id="modal-brady-alert" class="modal">
+        <div
+            style="font-size: 2.5rem; color: var(--c-red); font-weight: 900; text-align: center; margin-bottom: 30px; text-shadow: 0 0 20px #000;">
+            2 MIN!<br>RE-ASSESS HR</div>
+        <button class="action-btn bg-yellow suggested" style="width: 80%; height: 90px; font-size:1.5rem; color:black;"
+            onclick="brady.confirmCPRCheck()">OK, RE-ASSESSING</button>
     </div>
 
     <!-- UNIFIED CONFIRM MODAL (Safety Check - Highest Z-Index) -->
@@ -2082,6 +2105,8 @@
                 clearInterval(app.timer);
                 if (arrest.cprTimer) clearInterval(arrest.cprTimer);
                 if (arrest.epiTimer) clearInterval(arrest.epiTimer);
+                if (brady.cprTimer) clearInterval(brady.cprTimer);
+                if (brady.epiTimer) clearInterval(brady.epiTimer);
 
                 app.log(`--- ${reason.toUpperCase()} ---`, 'System');
                 document.getElementById('end-time').innerText = document.getElementById('total-time').innerText;
@@ -2281,6 +2306,14 @@
                 if (brady.atropineTimer) clearInterval(brady.atropineTimer);
                 brady.atropineTimer = null;
                 brady.atropineSecs = 0;
+                if (brady.cprTimer) clearInterval(brady.cprTimer);
+                brady.cprTimer = null;
+                brady.cprSecs = 120;
+                if (brady.epiTimer) clearInterval(brady.epiTimer);
+                brady.epiTimer = null;
+                brady.epiSecs = 180;
+                brady.cprCycle = 0;
+                brady.airwayGiven = false;
 
                 document.getElementById('log-list').innerHTML = '';
 
@@ -2320,6 +2353,12 @@
 
                 brady.epiCount = 0;
                 brady.atropineCount = 0;
+
+                // Reset brady CPR dashboard
+                document.getElementById('brady-cpr-dash').style.display = 'none';
+                document.getElementById('t-brady-cpr').innerText = '02:00';
+                document.getElementById('t-brady-epi').innerText = '03:00';
+                document.getElementById('t-brady-epi').style.color = 'var(--c-blue)';
 
                 document.getElementById('t-cpr').innerText = "02:00";
                 document.getElementById('btn-back').classList.add('hidden-back');
@@ -2636,13 +2675,21 @@
             atropineCount: 0,
             atropineTimer: null,
             atropineSecs: 0,
+            cprTimer: null,
+            cprSecs: 120,
+            epiTimer: null,
+            epiSecs: 180,
+            cprCycle: 0,
+            airwayGiven: false,
 
             init: (isStable) => {
                 const w = parseFloat(document.getElementById('pt-weight').value) || 0;
                 app.setView('v-brady-action');
                 const div = document.getElementById('brady-content');
+                const dash = document.getElementById('brady-cpr-dash');
 
                 if (isStable) {
+                    dash.style.display = 'none';
                     app.log("Bradycardia: Stable (Adequate Perfusion)", 'System');
                     app.guide("Stable Bradycardia", "Support ABCs • Oxygen • Observe", "g-safe");
                     div.innerHTML = `
@@ -2659,21 +2706,24 @@
                     app.log(`Unstable Bradycardia: HR < 60 + Poor Perfusion → CPR + Epi`, 'System');
                     app.guide("Unstable Bradycardia", "CPR → Epinephrine\nOxygenation First!", "g-alert");
 
+                    dash.style.display = 'none';
+                    brady.airwayGiven = false;
+
                     div.innerHTML = `
                         <div class="info-box">
                             <div class="info-row"><span>Epinephrine</span> <span>${epiDose} mg (0.01 mg/kg)</span></div>
                             <div class="info-row"><span>Volume (1:10,000)</span> <span>${epiVol} ml (0.1 ml/kg)</span></div>
                             <div class="info-row"><span>Max single dose</span> <span>1 mg</span></div>
                         </div>
-                        <button class="action-btn bg-red suggested" onclick="app.log('CPR Started (HR < 60 + Poor Perfusion) 15:2', 'Generic', this)">
+                        <button id="btn-brady-start-cpr" class="action-btn bg-red suggested" onclick="brady.startCPR()">
                             START CPR<span class="btn-sub">15:2 Ratio</span>
                         </button>
                         <div class="grid-2">
-                            <button id="btn-brady-epi" class="action-btn bg-blue suggested" onclick="brady.giveEpi()">
+                            <button id="btn-brady-epi" class="action-btn bg-blue dimmed locked" onclick="brady.giveEpi()">
                                 Epinephrine ${epiDose}mg
-                                <span id="sub-brady-epi" class="btn-sub">0.01 mg/kg IV/IO (q3-5m) #0</span>
+                                <span id="sub-brady-epi" class="btn-sub">Wait for CPR...</span>
                             </button>
-                            <button class="action-btn bg-green" style="background:#00695c;" onclick="app.log('Airway/Oxygenation Secured (Crucial!)', 'Generic', this)">
+                            <button id="btn-brady-airway" class="action-btn bg-green" style="background:#00695c;" onclick="brady.giveAirway()">
                                 Airway / O2<span class="btn-sub">Crucial Step!</span>
                             </button>
                         </div>
@@ -2684,25 +2734,133 @@
                                 Atropine ${atropineDose}mg
                                 <span id="sub-brady-atropine" class="btn-sub">0.02 mg/kg (Max ${atropineMax}) #0</span>
                             </button>
-                            <button class="action-btn bg-yellow" onclick="app.log('Transcutaneous Pacing Started', 'Generic', this)">
-                                TCP (Pacing)<span class="btn-sub">If Refractory</span>
+                            <button id="btn-brady-tcp" class="action-btn bg-yellow" onclick="brady.giveTCP()">
+                                TCP (Pacing)<span id="sub-brady-tcp" class="btn-sub">If Refractory</span>
                             </button>
                         </div>
-                        <button class="action-btn bg-dark" style="margin-top:8px;" onclick="app.log('Treat Reversible Causes (H\\'s & T\\'s - esp. Hypoxia)', 'Generic', this)">
-                            H's & T's<span class="btn-sub">Identify & Treat Causes</span>
-                        </button>
                     `;
                 }
             },
 
+            startCPR: () => {
+                brady.cprCycle++;
+                app.log(`CPR Started (HR < 60 + Poor Perfusion) 15:2 - Cycle #${brady.cprCycle}`, 'System');
+                app.guide("CPR IN PROGRESS", "Push Hard & Fast (110bpm) • 15:2", "g-cpr");
+
+                // Show dashboard
+                const dash = document.getElementById('brady-cpr-dash');
+                dash.style.display = '';
+                document.getElementById('brady-loop-status').innerText = `BRADY CPR CYCLE #${brady.cprCycle}`;
+
+                // Mark start CPR button as given (one-shot)
+                const startBtn = document.getElementById('btn-brady-start-cpr');
+                if (startBtn) {
+                    app.markGiven(startBtn, 'START CPR');
+                    startBtn.onclick = null;
+                }
+
+                // Start 2-min CPR timer
+                brady.cprSecs = 120;
+                document.getElementById('t-brady-cpr').innerText = '02:00';
+                if (brady.cprTimer) clearInterval(brady.cprTimer);
+                brady.cprTimer = setInterval(() => {
+                    brady.cprSecs--;
+                    document.getElementById('t-brady-cpr').innerText = app.fmtTime(brady.cprSecs);
+                    if (brady.cprSecs <= 0) {
+                        clearInterval(brady.cprTimer);
+                        brady.cprTimer = null;
+                        // Show brady CPR check modal
+                        document.getElementById('modal-brady-alert').style.display = 'flex';
+                    }
+                }, 1000);
+
+                // Start 3-min Epi timer
+                brady.epiSecs = 180;
+                document.getElementById('t-brady-epi').innerText = '03:00';
+                brady.startEpiTimer();
+
+                // Unlock epi button
+                const btnEpi = document.getElementById('btn-brady-epi');
+                if (btnEpi) {
+                    btnEpi.classList.remove('dimmed', 'locked');
+                    btnEpi.classList.add('suggested');
+                    const sub = document.getElementById('sub-brady-epi');
+                    if (sub) sub.innerText = `0.01 mg/kg IV/IO (q3-5m) #${brady.epiCount}`;
+                }
+            },
+
+            startEpiTimer: () => {
+                if (brady.epiTimer) clearInterval(brady.epiTimer);
+                brady.updateEpiVisuals();
+                brady.epiTimer = setInterval(() => {
+                    brady.epiSecs++;
+                    brady.updateEpiVisuals();
+                }, 1000);
+            },
+
+            updateEpiVisuals: () => {
+                const btn = document.getElementById('btn-brady-epi');
+                const t = document.getElementById('t-brady-epi');
+                if (!btn || !t) return;
+                t.innerText = app.fmtTime(brady.epiSecs);
+                if (brady.epiSecs >= 180) {
+                    btn.classList.add('urgent', 'bg-red', 'suggested');
+                    btn.classList.remove('bg-blue', 'dimmed', 'locked', 'bg-grey');
+                    btn.style.animation = 'urgent-flash 0.6s infinite alternate';
+                    const sub = document.getElementById('sub-brady-epi');
+                    if (sub) sub.innerText = `DUE NOW! 0.01mg/kg (#${brady.epiCount})`;
+                    t.style.color = 'var(--c-red)';
+                } else {
+                    btn.classList.remove('urgent', 'bg-red', 'suggested', 'bg-blue');
+                    btn.classList.add('bg-grey', 'dimmed', 'locked');
+                    btn.style.animation = '';
+                    const sub = document.getElementById('sub-brady-epi');
+                    if (sub) sub.innerText = `0.01mg/kg IV/IO (q3-5m) #${brady.epiCount}`;
+                    t.style.color = 'var(--c-blue)';
+                }
+            },
+
+            confirmCPRCheck: () => {
+                document.getElementById('modal-brady-alert').style.display = 'none';
+                app.log(`Brady CPR Cycle #${brady.cprCycle} End. Re-assess HR.`, 'System');
+                // Restart CPR timer for next cycle
+                brady.startCPR();
+            },
+
+            giveAirway: () => {
+                if (brady.airwayGiven) return;
+                brady.airwayGiven = true;
+                const btn = document.getElementById('btn-brady-airway');
+                app.log('Airway/Oxygenation Secured (Crucial!)', 'Generic');
+                if (btn) app.markGiven(btn, 'Airway / O2');
+            },
+
+            giveTCP: () => {
+                const btn = document.getElementById('btn-brady-tcp');
+                if (!btn) return;
+                app.log('Transcutaneous Pacing Started', 'Generic');
+                // Dim for 2 seconds then restore
+                btn.style.opacity = '0.4';
+                btn.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    btn.style.opacity = '';
+                    btn.style.pointerEvents = '';
+                }, 2000);
+            },
+
             giveEpi: () => {
+                const btn = document.getElementById('btn-brady-epi');
+                if (btn && btn.classList.contains('locked')) return;
                 const w = parseFloat(document.getElementById('pt-weight').value) || 0;
                 brady.epiCount++;
                 const dose = Math.min(w * 0.01, 1).toFixed(2);
                 const vol = (w * 0.1).toFixed(1);
                 app.log(`Epinephrine ${dose}mg IV/IO (0.01mg/kg, ${vol}ml 1:10,000) (#${brady.epiCount})`, 'Epi');
-                const sub = document.getElementById('sub-brady-epi');
-                if (sub) sub.innerText = `0.01 mg/kg IV/IO (q3-5m) #${brady.epiCount}`;
+                // Reset epi timer
+                brady.epiSecs = 0;
+                document.getElementById('t-brady-epi').innerText = '00:00';
+                document.getElementById('t-brady-epi').style.color = 'var(--c-blue)';
+                brady.updateEpiVisuals();
             },
 
             giveAtropine: () => {
