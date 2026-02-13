@@ -1675,6 +1675,11 @@
                         <span id="t-brady-epi" class="t-val" style="color:var(--c-blue)">03:00</span>
                     </div>
                 </div>
+                <div class="slider-wrap">
+                    <span class="slider-lbl">TEST SKIP</span>
+                    <input type="range" id="brady-cpr-slider" min="0" max="120" value="120"
+                        oninput="brady.sliderInput(this.value)" onchange="brady.sliderChange(this.value)">
+                </div>
             </div>
             <div id="brady-content" class="col-flex"></div>
             <div class="grid-2" style="margin-top:auto">
@@ -2742,6 +2747,18 @@
                 }
             },
 
+            sliderInput: (val) => { document.getElementById('t-brady-cpr').innerText = app.fmtTime(val); },
+            sliderChange: (val) => {
+                const oldSecs = brady.cprSecs;
+                brady.cprSecs = parseInt(val);
+                const diff = oldSecs - brady.cprSecs;
+                if (diff > 0) {
+                    brady.epiSecs += diff; // Sync Epi timer
+                    brady.updateEpiVisuals();
+                }
+                app.log(`[TEST] Skipped Brady CPR to ${val}s`, 'System');
+            },
+
             startCPR: () => {
                 brady.cprCycle++;
                 app.log(`CPR Started (HR < 60 + Poor Perfusion) 15:2 - Cycle #${brady.cprCycle}`, 'System');
@@ -2756,16 +2773,23 @@
                 const startBtn = document.getElementById('btn-brady-start-cpr');
                 if (startBtn) {
                     app.markGiven(startBtn, 'START CPR');
+                    app.markGiven(startBtn, 'START CPR');
                     startBtn.onclick = null;
                 }
+
+                // Initialize slider
+                const slider = document.getElementById('brady-cpr-slider');
+                if (slider) slider.value = 120;
 
                 // Start 2-min CPR timer
                 brady.cprSecs = 120;
                 document.getElementById('t-brady-cpr').innerText = '02:00';
+                document.getElementById('brady-cpr-slider').value = 120;
                 if (brady.cprTimer) clearInterval(brady.cprTimer);
                 brady.cprTimer = setInterval(() => {
                     brady.cprSecs--;
                     document.getElementById('t-brady-cpr').innerText = app.fmtTime(brady.cprSecs);
+                    document.getElementById('brady-cpr-slider').value = brady.cprSecs;
                     if (brady.cprSecs <= 0) {
                         clearInterval(brady.cprTimer);
                         brady.cprTimer = null;
@@ -2832,7 +2856,11 @@
                 brady.airwayGiven = true;
                 const btn = document.getElementById('btn-brady-airway');
                 app.log('Airway/Oxygenation Secured (Crucial!)', 'Generic');
-                if (btn) app.markGiven(btn, 'Airway / O2');
+                if (btn) {
+                    app.markGiven(btn, 'Airway / O2');
+                    btn.classList.add('locked'); // Lock button
+                    btn.style.pointerEvents = 'none';
+                }
             },
 
             giveTCP: () => {
@@ -2845,6 +2873,8 @@
                 setTimeout(() => {
                     btn.style.opacity = '';
                     btn.style.pointerEvents = '';
+                    // Ensure no checkmark or permanent state change
+                    btn.classList.remove('given-state');
                 }, 2000);
             },
 
