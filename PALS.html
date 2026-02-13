@@ -2675,7 +2675,7 @@
         };
 
         // --- BRADY MODULE (PALS) ---
-        const brady = {
+const brady = {
             epiCount: 0,
             atropineCount: 0,
             atropineTimer: null,
@@ -2713,6 +2713,10 @@
 
                     dash.style.display = 'none';
                     brady.airwayGiven = false;
+                    brady.cprCycle = 0;
+                    
+                    // Initialize Epi timer to "Due Now" state (3 mins) but don't start ticking until CPR starts
+                    brady.epiSecs = 180; 
 
                     div.innerHTML = `
                         <div class="info-box">
@@ -2773,7 +2777,6 @@
                 const startBtn = document.getElementById('btn-brady-start-cpr');
                 if (startBtn) {
                     app.markGiven(startBtn, 'START CPR');
-                    app.markGiven(startBtn, 'START CPR');
                     startBtn.onclick = null;
                 }
 
@@ -2798,19 +2801,17 @@
                     }
                 }, 1000);
 
-                // Start 3-min Epi timer
-                brady.epiSecs = 180;
-                document.getElementById('t-brady-epi').innerText = '03:00';
-                brady.startEpiTimer();
-
-                // Unlock epi button
-                const btnEpi = document.getElementById('btn-brady-epi');
-                if (btnEpi) {
-                    btnEpi.classList.remove('dimmed', 'locked');
-                    btnEpi.classList.add('suggested');
-                    const sub = document.getElementById('sub-brady-epi');
-                    if (sub) sub.innerText = `0.01 mg/kg IV/IO (q3-5m) #${brady.epiCount}`;
+                // Start 3-min Epi timer logic (Persistent across cycles)
+                // If timer is not running, start it.
+                if (!brady.epiTimer) {
+                    // Only reset if it's the very first cycle? No, init sets it to 180.
+                    // If we are in cycle 2+, keep current brady.epiSecs.
+                    // If cycle 1 (or restart), ensure we track time.
+                    brady.startEpiTimer();
                 }
+
+                // Unlock epi button if needed
+                brady.updateEpiVisuals();
             },
 
             startEpiTimer: () => {
@@ -2826,7 +2827,10 @@
                 const btn = document.getElementById('btn-brady-epi');
                 const t = document.getElementById('t-brady-epi');
                 if (!btn || !t) return;
+                
                 t.innerText = app.fmtTime(brady.epiSecs);
+                
+                // PALS: Epi every 3-5 min. We use 3 min (180s) as "Due".
                 if (brady.epiSecs >= 180) {
                     btn.classList.add('urgent', 'bg-red', 'suggested');
                     btn.classList.remove('bg-blue', 'dimmed', 'locked', 'bg-grey');
@@ -2860,6 +2864,7 @@
                     app.markGiven(btn, 'Airway / O2');
                     btn.classList.add('locked'); // Lock button
                     btn.style.pointerEvents = 'none';
+                    btn.setAttribute('disabled', 'true');
                 }
             },
 
@@ -2868,13 +2873,14 @@
                 if (!btn) return;
                 app.log('Transcutaneous Pacing Started', 'Generic');
                 // Dim for 2 seconds then restore
+                // REQUIREMENT: Allow repeat, don't stay ticked, just dim 2s.
                 btn.style.opacity = '0.4';
                 btn.style.pointerEvents = 'none';
                 setTimeout(() => {
                     btn.style.opacity = '';
                     btn.style.pointerEvents = '';
-                    // Ensure no checkmark or permanent state change
-                    btn.classList.remove('given-state');
+                    // Force remove given-state just in case
+                    btn.classList.remove('given-state'); 
                 }, 2000);
             },
 
