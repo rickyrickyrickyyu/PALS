@@ -1991,7 +1991,7 @@
                 else if (app.mode === 'tachy') diagnosis = "Unstable Tachycardia";
 
                 app.log(`Patient complains: ${sym}, 處置 ${diagnosis}`, 'Symptom');
-                app.handleStability(false);
+                app.handleStability(false, true);
             },
 
             initTimer: () => {
